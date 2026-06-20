@@ -564,34 +564,8 @@ function dh(d){return Math.round(dts(d).reduce((a,t)=>a+th(t),0)*10)/10}
 function dd(d){return dts(d).filter(t=>t.done).length}
 
 function seed(){const wk=wkKey(0);return[
-  {id:1,name:'Check todaylist',group:'Nhóm 1',day:'T2',hours:0.25,qty:1,deadline:'T2',nature:'Hàng tuần',tag:'nhom1',start:'08:00',done:false},
-  {id:2,name:'Duyệt Outline báo',group:'Phát sinh',day:'T2',hours:0.5,qty:2,deadline:'T3',nature:'Phát sinh',tag:'phatsinh',start:'08:30',done:false},
-  {id:3,name:'Duyệt dàn ý mới',group:'Nhóm 2',day:'T2',hours:0.5,qty:4,deadline:'T2',nature:'Hàng tuần',tag:'nhom2',start:'09:30',done:false},
-  {id:4,name:'Duyệt lại dàn ý',group:'Nhóm 4',day:'T2',hours:0.5,qty:3,deadline:'T3',nature:'Hàng tuần',tag:'nhom4',start:'11:30',done:false},
-  {id:5,name:'Sửa dàn ý',group:'Nhóm 2',day:'T2',hours:0.5,qty:1,deadline:'T4',nature:'Hàng tuần',tag:'nhom2',start:'13:30',done:false},
-  {id:6,name:'Check todaylist',group:'Nhóm 1',day:'T3',hours:0.25,qty:1,deadline:'T3',nature:'Hàng tuần',tag:'nhom1',start:'08:00',done:false},
-  {id:7,name:'Duyệt lại bài viết',group:'Nhóm 2',day:'T3',hours:1,qty:2,deadline:'T3',nature:'Hàng tuần',tag:'nhom2',start:'09:00',done:false},
-  {id:8,name:'Duyệt nội dung trang tĩnh',group:'Phát sinh',day:'T3',hours:0.5,qty:1,deadline:'T2',nature:'Phát sinh',tag:'phatsinh',start:'11:00',done:false},
-  {id:9,name:'Duyệt dàn ý mới',group:'Nhóm 4',day:'T3',hours:1,qty:3,deadline:'T2',nature:'Hàng tuần',tag:'nhom4',start:'13:00',done:false},
-  {id:10,name:'Check todaylist',group:'Nhóm 1',day:'T4',hours:0.25,qty:1,deadline:'T4',nature:'Hàng tuần',tag:'nhom1',start:'08:00',done:false},
-  {id:11,name:'Review dự án',group:'Nhóm 3',day:'T4',hours:1,qty:1,deadline:'T4',nature:'Hàng tuần',tag:'nhom3',start:'09:00',done:false},
-  {id:12,name:'Duyệt lại dàn ý',group:'Nhóm 4',day:'T4',hours:0.5,qty:3,deadline:'T5',nature:'Hàng tuần',tag:'nhom4',start:'10:30',done:false},
-  {id:13,name:'Duyệt bài viết mới',group:'Nhóm 2',day:'T4',hours:1,qty:2,deadline:'T5',nature:'Hàng tuần',tag:'nhom2',start:'13:00',done:false},
-  {id:14,name:'Sửa bài viết',group:'Nhóm 2',day:'T4',hours:0.5,qty:4,deadline:'T5',nature:'Hàng tuần',tag:'nhom2',start:'15:00',done:false},
-  {id:15,name:'Check todaylist',group:'Nhóm 1',day:'T5',hours:0.25,qty:1,deadline:'T5',nature:'Hàng tuần',tag:'nhom1',start:'08:00',done:false},
-  {id:16,name:'Review dự án',group:'Nhóm 3',day:'T5',hours:1,qty:1,deadline:'T5',nature:'Hàng tuần',tag:'nhom3',start:'09:00',done:false},
-  {id:17,name:'Check in nháp',group:'Nhóm 3',day:'T5',hours:1,qty:1,deadline:'T5',nature:'Hàng tuần',tag:'nhom3',start:'10:00',done:false},
-  {id:18,name:'Họp gấp',group:'Phát sinh',day:'T5',hours:1,qty:1,deadline:'T5',nature:'Gấp',tag:'gap',start:'11:00',done:false},
-  {id:19,name:'Training CTV',group:'Nhóm 3',day:'T5',hours:2,qty:1,deadline:'T5',nature:'Hàng tuần',tag:'nhom3',start:'13:00',done:false},
-  {id:20,name:'Sửa dàn ý (cũ)',group:'Nhóm 2',day:'T5',hours:0.15,qty:6,deadline:'T6',nature:'Hàng tuần',tag:'nhom2',start:'15:00',done:false},
-  {id:21,name:'Check todaylist',group:'Nhóm 1',day:'T6',hours:0.25,qty:1,deadline:'T6',nature:'Hàng tuần',tag:'nhom1',start:'08:00',done:false},
-  {id:22,name:'Duyệt dàn ý mới',group:'Nhóm 4',day:'T6',hours:1,qty:2,deadline:'T6',nature:'Hàng tuần',tag:'nhom4',start:'09:00',done:false},
-  {id:23,name:'Duyệt bài viết mới',group:'Nhóm 4',day:'T6',hours:1,qty:2,deadline:'T6',nature:'Hàng tuần',tag:'nhom4',start:'11:00',done:false},
-  {id:24,name:'Sửa bài viết (cũ)',group:'Nhóm 2',day:'T6',hours:0.5,qty:6,deadline:'T6',nature:'Hàng tuần',tag:'nhom2',start:'13:00',done:false},
-  {id:25,name:'Check in',group:'Nhóm 3',day:'T6',hours:0.5,qty:1,deadline:'T6',nature:'Hàng tuần',tag:'nhom3',start:'15:30',done:false},
-  {id:26,name:'Book bài',group:'Nhóm 3',day:'T6',hours:0.25,qty:1,deadline:'T6',nature:'Hàng tuần',tag:'nhom3',start:'16:00',done:false},
-  {id:27,name:'Làm SXCV tuần',group:'Nhóm 1',day:'T6',hours:1,qty:1,deadline:'CN',nature:'Hàng tuần',tag:'nhom1',start:'16:30',done:false},
-].map(t=>({...t,weekKey:wk}))}
+  {id:Date.now(),name:'Thêm task đầu tiên của bạn ✦',day:TODAY,hours:0.5,qty:1,deadline:'',recur:'none',recurDays:[],tag:TAGS[0]?.id||'nhom1',start:'09:00',done:false,desc:'',output:'',weekKey:wk},
+]}
 
 /* ── TAG MANAGEMENT (full CRUD) ── */
 const COLOR_PRESETS=[
