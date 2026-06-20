@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TaskWeek — Jenny Insights</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --cream:#FAF9F6;
+  --white:#FFFFFF;
+  --ink:#141412;
+  --ink2:#3A3A37;
+  --ink3:#64635E;
+  --border:#E8E7E3;
+  --border2:#D2D1CB;
+  --accent:#141412;
+  --purple:#9039FF;
+  --purple-dark:#7520E0;
+  --purple-light:#F2EAFF;
+  --green:#1a7a5a;
+  --green-light:#EAF5EF;
+  --red-light:#FDF0EE;
+  --red:#C0392B;
+  --amber:#B87333;
+  --amber-light:#FBF4E8;
+  --radius:6px;
+  --radius-lg:10px;
+  --sans:'Manrope',system-ui,sans-serif;
+}
+html{font-size:15px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+body{font-family:var(--sans);background:var(--cream);color:var(--ink);min-height:100vh;line-height:1.5}
+
+/* ── SHELL ── */
+.shell{display:grid;grid-template-columns:224px 1fr;grid-template-rows:56px 1fr;height:100vh;overflow:hidden}
+
+/* ── TOPBAR ── */
+.topbar{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:var(--white);border-bottom:1px solid var(--border)}
+.logo{font-family:var(--sans);font-size:17px;font-weight:800;color:var(--ink);letter-spacing:-0.03em;text-decoration:none}
+.logo sup{font-family:var(--sans);font-size:10px;font-weight:600;color:var(--ink3);letter-spacing:0.05em;text-transform:uppercase;margin-left:4px;vertical-align:super}
+.topbar-center{font-size:13px;font-weight:600;color:var(--ink2);letter-spacing:0.01em}
+.week-nav{display:flex;align-items:center;gap:4px}
+.wn-btn{background:none;border:none;cursor:pointer;color:var(--ink2);font-size:20px;line-height:1;padding:1px 8px;border-radius:var(--radius);transition:background 0.1s,color 0.1s;font-family:var(--sans)}
+.wn-btn:hover{background:var(--cream);color:var(--ink)}
+
+/* ── SIDEBAR ── */
+.sidebar{background:var(--white);border-right:1px solid var(--border);overflow-y:auto;display:flex;flex-direction:column;padding:20px 12px 16px}
+.sidebar-section{margin-bottom:24px}
+.sidebar-eyebrow{font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--ink3);padding:0 8px;margin-bottom:8px}
+.day-nav{display:flex;flex-direction:column;gap:1px}
+.day-btn{display:flex;align-items:center;justify-content:space-between;padding:7px 8px;border-radius:var(--radius);cursor:pointer;font-size:13px;font-weight:500;color:var(--ink2);border:none;background:none;width:100%;text-align:left;font-family:var(--sans);transition:background 0.1s,color 0.1s}
+.day-btn:hover{background:var(--cream);color:var(--ink)}
+.day-btn.active{background:var(--ink);color:var(--white);font-weight:600}
+.day-btn .pill{font-size:11px;font-weight:600;padding:1px 6px;border-radius:99px;background:var(--border);color:var(--ink2);min-width:28px;text-align:center;transition:background 0.1s,color 0.1s}
+.day-btn.active .pill{background:rgba(255,255,255,0.2);color:rgba(255,255,255,0.9)}
+.today-mark{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--green);margin-left:5px;vertical-align:middle}
+.sidebar-bottom{margin-top:auto;padding:14px 8px 0;border-top:1px solid var(--border)}
+.sidebar-stat-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.sidebar-stat-row .sk{font-size:12px;font-weight:500;color:var(--ink2)}
+.sidebar-stat-row .sv{font-size:14px;font-weight:700;color:var(--ink)}
+
+/* ── MAIN ── */
+.main{overflow:hidden;display:flex;flex-direction:column;background:var(--cream)}
+.viewbar{display:flex;align-items:center;gap:2px;padding:10px 20px;background:var(--white);border-bottom:1px solid var(--border);flex-shrink:0}
+.view-tab{padding:5px 14px;font-size:13px;font-weight:500;border-radius:var(--radius);cursor:pointer;background:none;border:1px solid transparent;color:var(--ink2);font-family:var(--sans);transition:all 0.1s}
+.view-tab:hover{background:var(--cream);color:var(--ink)}
+.view-tab.active{background:var(--cream);color:var(--ink);border-color:var(--border2);font-weight:700}
+.viewbar-right{margin-left:auto}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;font-size:13px;font-weight:600;border-radius:var(--radius);cursor:pointer;font-family:var(--sans);border:1px solid var(--border2);background:var(--white);color:var(--ink);transition:all 0.12s;text-decoration:none;white-space:nowrap}
+.btn:hover{background:var(--cream)}
+.btn.dark{background:var(--ink);color:var(--white);border-color:var(--ink)}
+.btn.dark:hover{background:#2a2a26}
+.btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.main-scroll{flex:1;overflow-y:auto;padding:20px 24px}
+
+/* ── TAGS ── */
+.tag{display:inline-flex;align-items:center;font-size:11px;font-weight:700;padding:2px 8px;border-radius:3px;white-space:nowrap;letter-spacing:0.02em}
+
+/* ── DAY VIEW ── */
+.day-head{margin-bottom:16px}
+.day-head h2{font-family:var(--sans);font-size:24px;font-weight:800;letter-spacing:-0.03em;color:var(--ink);line-height:1.15}
+.day-head .day-sub{font-size:13px;font-weight:500;color:var(--ink2);margin-top:4px}
+.prog-row{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.prog-track{flex:1;height:5px;background:var(--border);border-radius:99px;overflow:hidden;display:flex;gap:1px}
+.prog-seg{height:100%;flex-shrink:0;transition:width 0.5s ease}
+.prog-label{font-size:12px;font-weight:600;color:var(--ink2);white-space:nowrap}
+.prog-breakdown{display:flex;gap:10px;flex-wrap:wrap;margin-top:-8px;margin-bottom:16px}
+.pbd{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--ink2)}
+.pbd-dot{width:7px;height:7px;border-radius:2px;flex-shrink:0}
+.filters{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:16px}
+.fchip{font-size:12px;font-weight:600;padding:3px 10px;border-radius:99px;cursor:pointer;border:1px solid var(--border2);color:var(--ink);background:none;font-family:var(--sans);transition:all 0.1s}
+.fchip:hover{border-color:var(--ink2)}
+.fchip.on{background:var(--ink);border-color:var(--ink);color:var(--white)}
+.group-sec{margin-bottom:20px}
+.group-lbl{font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink2);margin-bottom:7px;padding-left:2px}
+.task-stack{display:flex;flex-direction:column;gap:3px}
+.task-row{display:flex;align-items:flex-start;gap:10px;padding:11px 12px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius);transition:border-color 0.1s,background 0.1s;cursor:default}
+.task-row:hover{border-color:var(--border2)}
+.task-row.done{background:var(--cream)}
+.task-row.selected{background:#F3F0FF;border-color:var(--purple)}
+.sel-chk{width:18px;height:18px;border:2px solid var(--border2);border-radius:50%;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all 0.12s;font-size:10px;font-weight:700}
+.sel-chk.on{background:var(--purple);border-color:var(--purple);color:var(--white)}
+.chk{width:16px;height:16px;border:1.5px solid var(--border2);border-radius:3px;cursor:pointer;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:all 0.12s}
+.chk.on{background:var(--green);border-color:var(--green)}
+.chk svg{width:9px;height:9px;stroke:white;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.task-body{flex:1;min-width:0}
+.task-top{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.task-name{font-size:14px;font-weight:500;color:var(--ink);line-height:1.4}
+.task-row.done .task-name{text-decoration:line-through;color:var(--ink3)}
+.task-meta{display:flex;align-items:center;gap:8px;margin-top:4px;flex-wrap:wrap}
+.task-meta span{font-size:12px;font-weight:500;color:var(--ink3);display:inline-flex;align-items:center;gap:3px}
+.task-output{font-size:11px;color:var(--ink3);margin-top:3px;font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:360px}
+.dash-insight-row{display:flex;gap:8px;margin-bottom:20px;align-items:stretch}
+.dash-ins{flex:1;margin-bottom:0}
+.dash-out-card{overflow:hidden}
+.out-line{font-size:12px;font-weight:500;color:var(--ink2);padding:4px 0;border-bottom:1px solid var(--border);line-height:1.4;display:flex;gap:5px;align-items:baseline}
+.out-line:last-child{border-bottom:none}
+.out-done{font-size:10px;font-weight:700;color:var(--green);flex-shrink:0}
+.out-empty{font-size:12px;color:var(--ink3);margin:0}
+.task-meta svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.recur-tag{display:inline-flex;align-items:center;gap:2px;font-size:11px;font-weight:600;color:var(--purple)}
+.recur-day-btn{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border:1.5px solid var(--border2);border-radius:20px;cursor:pointer;font-size:12px;font-weight:600;color:var(--ink2);transition:all 0.1s;user-select:none}
+.recur-day-btn:has(.recur-day-chk:checked){background:var(--purple);border-color:var(--purple);color:var(--white)}
+.recur-day-chk{position:absolute;opacity:0;width:0;height:0}
+.select-bar{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--white);border-radius:99px;padding:8px 8px 8px 16px;display:none;align-items:center;gap:8px;font-size:13px;font-weight:600;z-index:600;box-shadow:0 4px 24px rgba(0,0,0,0.3);white-space:nowrap}
+.select-bar .sb-del{background:var(--red);color:var(--white);border:none;padding:6px 16px;border-radius:99px;cursor:pointer;font-size:12px;font-weight:700;font-family:var(--sans)}
+.select-bar .sb-cancel{background:rgba(255,255,255,0.15);color:var(--white);border:none;padding:6px 14px;border-radius:99px;cursor:pointer;font-size:12px;font-weight:600;font-family:var(--sans)}
+.del{opacity:0;padding:2px;background:none;border:none;cursor:pointer;color:var(--ink3);transition:opacity 0.1s;flex-shrink:0}
+.del svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.task-row:hover .del{opacity:1}
+.del:hover{color:var(--red)}
+.empty{text-align:center;padding:56px 0;color:var(--ink3)}
+.empty svg{width:32px;height:32px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;opacity:0.3;margin-bottom:10px}
+.empty p{font-size:14px;font-weight:500}
+
+/* ── TIME BLOCKER ── */
+.blocker-hint{font-size:13px;font-weight:500;color:var(--ink2);margin-bottom:10px}
+.blocker-scroll{overflow-x:auto;overflow-y:auto;max-height:calc(100vh - 150px)}
+.b-grid{display:block;min-width:640px}
+.b-head{position:sticky;top:0;z-index:10;background:var(--white);border-bottom:1px solid var(--border);display:grid;grid-template-columns:44px repeat(7,1fr)}
+.bh{padding:8px 4px;font-size:12px;font-weight:500;color:var(--ink2);text-align:center;border-right:1px solid var(--border)}
+.bh:last-child{border-right:none}
+.bh.today{color:var(--green);font-weight:600}
+.b-body{display:grid;grid-template-columns:44px repeat(7,1fr)}
+.t-col{display:flex;flex-direction:column}
+.t-cell{height:48px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:flex-end;padding:2px 5px 0 0;font-size:10px;font-weight:400;color:var(--ink3);flex-shrink:0}
+.d-col{position:relative;border-right:1px solid var(--border);min-height:624px}
+.d-col:last-child{border-right:none}
+.h-line{position:absolute;left:0;right:0;height:1px;background:var(--border);pointer-events:none}
+.h-half{position:absolute;left:0;right:0;height:1px;pointer-events:none;border-top:1px dashed var(--border)}
+.block{position:absolute;left:2px;right:2px;border-radius:4px;padding:3px 6px;cursor:pointer;overflow:hidden;font-size:11px;line-height:1.35;border:1px solid rgba(0,0,0,0.1);text-align:left;transition:opacity 0.15s;box-shadow:0 1px 3px rgba(0,0,0,0.12)}
+.block:hover{filter:brightness(0.93)}
+.block:hover{opacity:0.8}
+.block .bn{font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:var(--sans)}
+.block .bd{opacity:0.75;font-size:10px;font-weight:400;font-family:var(--sans)}
+.block.done-blk{opacity:0.6}
+.block.done-blk .bn{text-decoration:line-through;text-decoration-thickness:1.5px}
+.now-line{position:absolute;left:0;right:0;height:2px;background:#E24B4A;z-index:5;pointer-events:none}
+.now-dot{position:absolute;left:-3px;top:-4px;width:8px;height:8px;border-radius:50%;background:#E24B4A}
+
+/* ── DASHBOARD ── */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:24px}
+.sc{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 16px}
+.sc-lbl{font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px}
+.sc-val{font-family:var(--sans);font-size:28px;font-weight:800;letter-spacing:-0.04em;color:var(--ink);line-height:1}
+.sc-val sup{font-family:var(--sans);font-size:13px;font-weight:500;color:var(--ink3)}
+.sc-sub{font-size:12px;font-weight:500;color:var(--ink2);margin-top:4px}
+.dash-h{font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink2);margin-bottom:10px}
+.dash-top{background:var(--purple-light);border:1px solid var(--purple);border-radius:var(--radius-lg);padding:14px 16px;margin-bottom:20px;display:flex;align-items:center;gap:14px}
+.dash-top-badge{font-size:24px;line-height:1}
+.dash-top-lbl{font-size:10px;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:3px}
+.dash-top-name{font-size:16px;font-weight:800;color:var(--ink);letter-spacing:-0.02em}
+.dash-top-sub{font-size:12px;font-weight:500;color:var(--ink3);margin-top:2px}
+#confetti-canvas{position:fixed;inset:0;pointer-events:none;z-index:9999;display:none}
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.bar-lbl{font-size:12px;font-weight:600;color:var(--ink);width:36px;flex-shrink:0}
+.bar-track{flex:1;height:6px;background:var(--border);border-radius:99px;overflow:hidden}
+.bar-fill{height:100%;border-radius:99px;background:var(--ink);transition:width 0.5s ease}
+.bar-fill.done{background:var(--green)}
+.bar-val{font-size:12px;font-weight:600;color:var(--ink2);width:30px;text-align:right;flex-shrink:0}
+.tag-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)}
+.tag-row:last-child{border-bottom:none}
+.tag-bar{flex:1;height:3px;background:var(--border);border-radius:99px;overflow:hidden}
+.tag-fill{height:100%;border-radius:99px;transition:width 0.4s}
+.tag-meta{font-size:12px;font-weight:600;color:var(--ink2);white-space:nowrap}
+
+/* ── MODAL ── */
+.backdrop{display:none;position:fixed;inset:0;background:rgba(20,20,18,0.4);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
+.backdrop.open{display:flex}
+.modal{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;width:380px;max-height:90vh;overflow-y:auto;box-shadow:0 12px 40px rgba(0,0,0,0.1)}
+.modal-title{font-family:var(--sans);font-size:18px;font-weight:800;letter-spacing:-0.02em;color:var(--ink);margin-bottom:18px}
+.frow{margin-bottom:12px}
+.frow label{display:block;font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink2);margin-bottom:5px}
+.frow input,.frow select,.frow textarea{width:100%;font-size:14px;font-weight:400;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--radius);background:var(--white);color:var(--ink);font-family:var(--sans);outline:none;transition:border-color 0.12s}
+.frow input:focus,.frow select:focus,.frow textarea:focus{border-color:var(--ink)}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;padding-top:16px;border-top:1px solid var(--border)}
+.tp{display:flex;gap:6px;flex-wrap:wrap}
+.tpchip{font-size:12px;font-weight:700;padding:3px 10px;border-radius:3px;cursor:pointer;border:2px solid transparent;transition:all 0.1s;font-family:var(--sans)}
+.tpchip.sel{transform:scale(1.06);font-weight:800}
+
+/* block detail modal */
+.bm-body{font-size:13px;font-weight:500;color:var(--ink2);line-height:2;margin-bottom:4px}
+
+/* ── CONFIRM DIALOG ── */
+.confirm-wrap{text-align:center;padding:4px 0 8px}
+.confirm-icon{width:52px;height:52px;border-radius:50%;background:var(--red-light);display:flex;align-items:center;justify-content:center;margin:0 auto 18px}
+.confirm-icon svg{width:22px;height:22px;stroke:var(--red);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.confirm-title{font-size:16px;font-weight:800;color:var(--ink);letter-spacing:-0.02em;margin-bottom:8px}
+.confirm-msg{font-size:13px;font-weight:500;color:var(--ink3);line-height:1.55}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--ink);color:var(--white);font-size:12px;font-weight:700;letter-spacing:0.04em;padding:8px 18px;border-radius:99px;z-index:2000;opacity:0;transition:all 0.2s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── TAG SETTINGS ── */
+.sidebar-mgr-btn{display:flex;align-items:center;gap:6px;margin-top:10px;padding:5px 4px;font-size:11px;font-weight:600;color:var(--ink3);background:none;border:none;cursor:pointer;font-family:var(--sans);transition:color 0.1s;width:100%;text-align:left}
+.sidebar-mgr-btn:hover{color:var(--purple)}
+.tag-edit-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border)}
+.tag-edit-row:last-child{border-bottom:none}
+.tag-swatch-btn{width:34px;height:26px;border-radius:4px;flex-shrink:0;cursor:pointer;transition:opacity 0.1s;border:none}
+.tag-swatch-btn:hover{opacity:0.75}
+.tag-edit-input{flex:1;font-size:13px;font-weight:500;padding:5px 9px;border:1px solid var(--border2);border-radius:var(--radius);font-family:var(--sans);color:var(--ink);outline:none;transition:border-color 0.12s}
+.tag-edit-input:focus{border-color:var(--purple)}
+.tag-use-count{font-size:10px;font-weight:600;color:var(--ink3);white-space:nowrap;min-width:38px;text-align:right}
+.tag-del-btn{padding:4px 5px;background:none;border:none;cursor:pointer;color:var(--ink3);border-radius:4px;transition:all 0.1s;flex-shrink:0;line-height:0}
+.tag-del-btn:hover:not(:disabled){color:var(--red);background:var(--red-light)}
+.tag-del-btn:disabled{opacity:0.25;cursor:not-allowed}
+.cp-row{display:flex;gap:6px;flex-wrap:wrap;padding:6px 2px 12px}
+.cp-swatch{width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:transform 0.1s,border-color 0.1s;flex-shrink:0}
+.cp-swatch:hover{transform:scale(1.18)}
+.cp-swatch.sel{border-color:var(--ink);transform:scale(1.12)}
+.tag-add-btn{display:flex;align-items:center;gap:6px;padding:7px 2px;font-size:12px;font-weight:600;color:var(--purple);background:none;border:none;cursor:pointer;font-family:var(--sans);transition:opacity 0.1s;margin-top:2px}
+.tag-add-btn:hover{opacity:0.7}
+
+/* ── TASK PLAY BUTTON ── */
+.task-play{opacity:0;padding:3px 4px;background:none;border:none;cursor:pointer;color:var(--purple);transition:opacity 0.1s;flex-shrink:0}
+.task-play svg{width:13px;height:13px;fill:currentColor;stroke:none}
+.task-row:hover .task-play{opacity:1}
+
+/* ── POMODORO ── */
+@keyframes pomoPulse{0%,100%{box-shadow:0 4px 16px rgba(144,57,255,0.35)}50%{box-shadow:0 4px 28px rgba(144,57,255,0.65)}}
+.pomo-fab{position:fixed;bottom:28px;right:28px;width:54px;height:54px;border-radius:50%;background:var(--white);color:var(--ink);border:1px solid var(--border2);cursor:pointer;font-size:24px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,0.14),0 1px 4px rgba(0,0,0,0.08);z-index:400;transition:transform 0.15s}
+.pomo-fab:hover{transform:scale(1.08)}
+.pomo-panel{width:400px;background:var(--white);border-radius:var(--radius-lg);overflow:hidden}
+.pomo-phases{display:flex;border-bottom:1px solid var(--border)}
+.pomo-phase-btn{flex:1;padding:9px 0;font-size:10px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;border:none;background:none;cursor:pointer;color:var(--ink3);font-family:var(--sans);transition:all 0.1s;border-right:1px solid var(--border)}
+.pomo-phase-btn:last-child{border-right:none}
+.pomo-phase-btn.active{color:var(--purple);background:var(--purple-light)}
+.pomo-phase-btn:hover:not(.active){background:var(--cream)}
+.pomo-body{padding:22px 24px 18px;text-align:center}
+.pomo-meta-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.pomo-phase-lbl{font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink3)}
+.pomo-dots{display:flex;gap:5px}
+.pomo-dot{width:8px;height:8px;border-radius:50%;background:var(--border2)}
+.pomo-dot.done{background:var(--purple)}
+.pomo-time{font-size:60px;font-weight:800;letter-spacing:-0.04em;color:var(--ink);line-height:1;margin-bottom:18px;font-family:var(--sans)}
+.pomo-time.running{color:var(--purple)}
+.pomo-prog-wrap{height:4px;background:var(--border);border-radius:99px;overflow:hidden;margin-bottom:20px}
+.pomo-prog-fill{height:100%;background:var(--purple);border-radius:99px;transition:width 1s linear}
+.pomo-controls{display:flex;gap:8px}
+.pomo-controls{display:flex;gap:10px;align-items:center}
+.pomo-btn{border-radius:var(--radius);border:1px solid var(--border2);background:var(--white);cursor:pointer;font-weight:700;color:var(--ink2);font-family:var(--sans);transition:all 0.15s;line-height:1}
+.pomo-btn:hover{background:var(--cream)}
+.pomo-side{width:42px;height:42px;font-size:16px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.pomo-action{flex:1;height:42px;font-size:13px;font-weight:700}
+.pomo-action:hover{background:var(--cream)}
+.pomo-action.on{background:var(--purple);color:var(--white);border-color:var(--purple)}
+.pomo-action.on:hover{background:var(--purple-dark);border-color:var(--purple-dark)}
+.pomo-task-section{border-top:1px solid var(--border);padding:16px 20px 20px;background:var(--cream)}
+.pomo-task-hd{font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink3);margin-bottom:9px}
+.pomo-task-current{display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--purple-light);border-radius:var(--radius);margin-bottom:12px;font-size:13px;font-weight:600;color:var(--purple);min-height:38px}
+.pomo-task-current.empty{background:var(--cream);color:var(--ink3);font-weight:500;font-size:12px}
+.pomo-task-list{max-height:130px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--radius);margin-bottom:10px}
+.pomo-task-item{display:flex;align-items:center;gap:8px;padding:8px 12px;cursor:pointer;font-size:13px;font-weight:500;color:var(--ink2);transition:background 0.1s;border-bottom:1px solid var(--border)}
+.pomo-task-item:last-child{border-bottom:none}
+.pomo-task-item:hover{background:var(--cream)}
+.pomo-task-item.active{background:var(--purple-light);color:var(--purple);font-weight:600}
+.pomo-task-bullet{width:7px;height:7px;border-radius:50%;border:2px solid var(--border2);flex-shrink:0;transition:all 0.1s}
+.pomo-task-item.active .pomo-task-bullet{background:var(--purple);border-color:var(--purple)}
+.pomo-task-empty{padding:14px 12px;font-size:12px;color:var(--ink3);text-align:center}
+.pomo-add-row{display:flex;gap:6px}
+.pomo-add-input{flex:1;font-size:12px;font-weight:500;padding:7px 10px;border:1px solid var(--border2);border-radius:var(--radius);font-family:var(--sans);color:var(--ink);outline:none;transition:border-color 0.12s}
+.pomo-add-input:focus{border-color:var(--purple)}
+.pomo-add-btn{padding:7px 14px;background:var(--purple);color:var(--white);border:none;border-radius:var(--radius);cursor:pointer;font-size:12px;font-weight:600;font-family:var(--sans);transition:background 0.1s;white-space:nowrap}
+.pomo-add-btn:hover{background:var(--purple-dark)}
+
+/* scrollbar */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <a href="https://jennyinsights.com" class="logo">Jenny.<sup>tasks</sup></a>
+    <div class="week-nav">
+      <button class="wn-btn" onclick="navWeek(-1)" title="Tuần trước">‹</button>
+      <span class="topbar-center" id="week-label" style="min-width:148px;text-align:center;display:inline-block"></span>
+      <button class="wn-btn" onclick="navWeek(1)" title="Tuần sau">›</button>
+    </div>
+    <div id="today-wrap"></div>
+  </header>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-eyebrow">Tuần này</div>
+      <nav class="day-nav" id="day-nav"></nav>
+    </div>
+    <div class="sidebar-bottom" id="sidebar-bottom"></div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="viewbar">
+      <button class="view-tab" onclick="setView('all')">Tất cả</button>
+      <button class="view-tab" onclick="setView('day')">Hôm nay</button>
+      <button class="view-tab" onclick="setView('blocker')">Time Blocker</button>
+      <button class="view-tab" onclick="setView('dash')">Dashboard</button>
+      <div class="viewbar-right" style="display:flex;align-items:center;gap:6px">
+        <button id="select-mode-btn" class="btn" onclick="toggleSelectMode()" style="display:none">Chọn nhiều</button>
+        <button class="btn dark" onclick="openTaskModal()">
+          <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Thêm task ✦
+        </button>
+      </div>
+    </div>
+    <div class="main-scroll" id="main-scroll"></div>
+  </main>
+</div>
+
+<!-- TASK MODAL -->
+<div class="backdrop" id="task-modal" onclick="closeTaskModal()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-title" id="modal-title">Thêm task mới</div>
+    <div class="frow">
+      <label>Tên task</label>
+      <input id="f-name" type="text" placeholder="Ví dụ: Duyệt dàn ý mới">
+    </div>
+    <div class="fgrid">
+      <div class="frow">
+        <label>Ngày làm</label>
+        <select id="f-day" onchange="onRecurChange()">
+          <option value="T2">Thứ 2</option><option value="T3">Thứ 3</option>
+          <option value="T4">Thứ 4</option><option value="T5">Thứ 5</option>
+          <option value="T6">Thứ 6</option><option value="T7">Thứ 7</option>
+          <option value="CN">Chủ nhật</option>
+        </select>
+      </div>
+      <div class="frow">
+        <label>Deadline</label>
+        <select id="f-deadline">
+          <option value="">—</option>
+          <option value="T2">Thứ 2</option><option value="T3">Thứ 3</option>
+          <option value="T4">Thứ 4</option><option value="T5">Thứ 5</option>
+          <option value="T6">Thứ 6</option><option value="T7">Thứ 7</option>
+          <option value="CN">Chủ nhật</option>
+        </select>
+      </div>
+    </div>
+    <div class="fgrid">
+      <div class="frow">
+        <label>Thời gian (giờ)</label>
+        <input id="f-hours" type="number" step="0.25" min="0.25" value="0.5">
+      </div>
+      <div class="frow">
+        <label>Số lượng</label>
+        <input id="f-qty" type="number" min="1" value="1">
+      </div>
+    </div>
+    <div class="fgrid">
+      <div class="frow">
+        <label>Giờ bắt đầu</label>
+        <input id="f-start" type="time" value="09:00">
+      </div>
+      <div class="frow">
+        <label>Lặp lại</label>
+        <select id="f-recur" onchange="onRecurChange()">
+          <option value="none">Không lặp lại</option>
+          <option value="daily">Hàng ngày</option>
+          <option value="custom">Hàng tuần vào...</option>
+        </select>
+      </div>
+    </div>
+    <div id="recur-days-wrap" style="display:none;flex-wrap:wrap;gap:6px;padding:2px 0 6px">
+      <div style="width:100%;font-size:12px;color:var(--ink3);font-weight:600;margin-bottom:2px">Lặp vào các ngày:</div>
+      <label class="recur-day-btn"><input type="checkbox" class="recur-day-chk" value="T2">T2</label>
+      <label class="recur-day-btn"><input type="checkbox" class="recur-day-chk" value="T3">T3</label>
+      <label class="recur-day-btn"><input type="checkbox" class="recur-day-chk" value="T4">T4</label>
+      <label class="recur-day-btn"><input type="checkbox" class="recur-day-chk" value="T5">T5</label>
+      <label class="recur-day-btn"><input type="checkbox" class="recur-day-chk" value="T6">T6</label>
+      <label class="recur-day-btn"><input type="checkbox" class="recur-day-chk" value="T7">T7</label>
+      <label class="recur-day-btn"><input type="checkbox" class="recur-day-chk" value="CN">CN</label>
+    </div>
+    <div class="frow">
+      <label>Nhóm công việc</label>
+      <div class="tp" id="tag-picker"></div>
+    </div>
+    <div class="frow">
+      <label>Mô tả <span style="font-weight:400;color:var(--ink3)">(tuỳ chọn — ghi chú, link tài liệu...)</span></label>
+      <textarea id="f-desc" rows="2" placeholder="Ví dụ: https://docs.google.com/... hoặc ghi chú thêm" style="resize:vertical"></textarea>
+    </div>
+    <div class="frow">
+      <label>Output / Kết quả <span style="font-weight:400;color:var(--ink3)">(tuỳ chọn)</span></label>
+      <textarea id="f-output" rows="2" placeholder="Ví dụ: Đã gửi báo cáo, hoàn thành 3 slides..." style="resize:vertical"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeTaskModal()">Huỷ</button>
+      <button class="btn dark" onclick="saveTask()">Lưu task ✦</button>
+    </div>
+  </div>
+</div>
+
+<!-- BLOCK DETAIL -->
+<div class="backdrop" id="block-modal" onclick="closeBlockModal()">
+  <div class="modal" onclick="event.stopPropagation()" style="width:300px">
+    <div class="modal-title" id="bm-title">—</div>
+    <div class="bm-body" id="bm-body"></div>
+    <div class="modal-actions">
+      <button class="btn" id="bm-del" onclick="deleteFromBlock()" style="color:var(--red);border-color:var(--red)">Xoá</button>
+      <button class="btn" onclick="editFromBlock()">Chỉnh sửa</button>
+      <button class="btn dark" id="bm-toggle" onclick="toggleFromBlock()">Xong ✦</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM DIALOG -->
+<div class="backdrop" id="confirm-modal" onclick="confirmCancel()">
+  <div class="modal" onclick="event.stopPropagation()" style="width:300px">
+    <div class="confirm-wrap">
+      <div class="confirm-icon">
+        <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+      </div>
+      <div class="confirm-title" id="confirm-title"></div>
+      <div class="confirm-msg" id="confirm-msg"></div>
+    </div>
+    <div class="modal-actions" style="justify-content:center;gap:10px;margin-top:22px">
+      <button class="btn" onclick="confirmCancel()" style="min-width:90px">Huỷ</button>
+      <button class="btn" id="confirm-ok-btn" onclick="confirmOk()" style="min-width:90px">Xoá</button>
+    </div>
+  </div>
+</div>
+
+<!-- TAG SETTINGS -->
+<div class="backdrop" id="tag-modal" onclick="closeTagModal()">
+  <div class="modal" onclick="event.stopPropagation()" style="width:360px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div class="modal-title" style="margin-bottom:0">Quản lý nhóm</div>
+      <button class="btn" onclick="addEditTag()" style="padding:4px 12px;font-size:12px">+ Thêm nhóm</button>
+    </div>
+    <div id="tag-edit-list"></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeTagModal()">Huỷ</button>
+      <button class="btn dark" onclick="saveTagsFull()">Lưu ✦</button>
+    </div>
+  </div>
+</div>
+
+<!-- POMODORO -->
+<div class="backdrop" id="pomo-backdrop" onclick="closePomoModal()">
+  <div class="pomo-panel" onclick="event.stopPropagation()">
+    <div class="pomo-phases">
+      <button class="pomo-phase-btn active" id="pomo-ph-work" onclick="pomoSetPhase('work')">Làm việc</button>
+      <button class="pomo-phase-btn" id="pomo-ph-short" onclick="pomoSetPhase('short')">Nghỉ ngắn</button>
+      <button class="pomo-phase-btn" id="pomo-ph-long" onclick="pomoSetPhase('long')">Nghỉ dài</button>
+    </div>
+    <div class="pomo-body">
+      <div class="pomo-meta-row">
+        <span class="pomo-phase-lbl" id="pomo-phase-lbl">Làm việc · 25 phút</span>
+        <div class="pomo-dots" id="pomo-dots"></div>
+      </div>
+      <div class="pomo-time" id="pomo-time">25:00</div>
+      <div class="pomo-prog-wrap"><div class="pomo-prog-fill" id="pomo-prog" style="width:0%"></div></div>
+      <div class="pomo-controls">
+        <button class="pomo-btn pomo-side" onclick="pomoReset()" title="Đặt lại">↺</button>
+        <button class="pomo-btn pomo-action" id="pomo-start" onclick="pomoStart()">▶ Bắt đầu</button>
+        <button class="pomo-btn pomo-action" id="pomo-pause" onclick="pomoPause()">⏸ Tạm dừng</button>
+        <button class="pomo-btn pomo-side" onclick="pomoSkip()" title="Bỏ qua">⏭</button>
+      </div>
+    </div>
+    <div class="pomo-task-section">
+      <div class="pomo-task-hd">Task đang làm</div>
+      <div id="pomo-task-current" class="pomo-task-current empty">Chọn task bên dưới để bắt đầu</div>
+      <div id="pomo-task-list" class="pomo-task-list"></div>
+      <div class="pomo-add-row">
+        <input class="pomo-add-input" id="pomo-add-input" placeholder="Thêm task mới..." maxlength="80" autocomplete="off" onkeydown="if(event.key==='Enter'&&!event.isComposing){event.preventDefault();event.stopPropagation();pomoAddTask();}">
+        <button type="button" class="pomo-add-btn" onclick="pomoAddTask()">+ Thêm</button>
+      </div>
+    </div>
+  </div>
+</div>
+<button class="pomo-fab" id="pomo-fab" onclick="openPomoModal()" title="Pomodoro Timer">🍅</button>
+
+<canvas id="confetti-canvas"></canvas>
+<div class="toast" id="toast"></div>
+
+<script>
+const DAYS=['T2','T3','T4','T5','T6','T7','CN'];
+const DFULL={T2:'Thứ 2',T3:'Thứ 3',T4:'Thứ 4',T5:'Thứ 5',T6:'Thứ 6',T7:'Thứ 7',CN:'Chủ nhật'};
+const TODAY=['CN','T2','T3','T4','T5','T6','T7'][new Date().getDay()];
+const DAY_IDX={T2:0,T3:1,T4:2,T5:3,T6:4,T7:5,CN:6};
+const HP=48,DS=0,DE=24;
+const HOURS=Array.from({length:DE-DS},(_,i)=>DS+i);
+
+let TAGS=[
+  {id:'nhom1',label:'Nhóm 1',bg:'#EAF2FF',color:'#1a4a8a',bar:'#2563EB'},
+  {id:'nhom2',label:'Nhóm 2',bg:'#EAF5EF',color:'#166534',bar:'#16a34a'},
+  {id:'nhom3',label:'Nhóm 3',bg:'#F3F0FF',color:'#4C1D95',bar:'#7C3AED'},
+  {id:'nhom4',label:'Nhóm 4',bg:'#FBF4E8',color:'#92400E',bar:'#D97706'},
+  {id:'phatsinh',label:'Phát sinh',bg:'#FDF0EE',color:'#9B1C1C',bar:'#DC2626'},
+  {id:'gap',label:'Gấp',bg:'#FFF0F0',color:'#7F1D1D',bar:'#EF4444'},
+];
+
+let tasks=[],view='all',activeDay=TODAY,filterTag=null,editId=null,blockId=null,blockDay=null,blockWk=null,selTag=null,weekOffset=0;
+let selectMode=false,selected=new Set();
+
+function getWeekStart(off){const n=new Date(),jd=n.getDay(),m=new Date(n);m.setDate(n.getDate()+(jd===0?-6:1-jd)+off*7);m.setHours(0,0,0,0);return m;}
+function wkKey(off){return getWeekStart(off).toISOString().slice(0,10);}
+function dayLabel(code,off){const d=new Date(getWeekStart(off));d.setDate(d.getDate()+DAY_IDX[code]);return`${d.getDate()}/${d.getMonth()+1}`;}
+function recurDays(t){
+  if(!t.recur||t.recur==='none')return[];
+  if(t.recur==='daily')return[...DAYS];
+  if(t.recur==='weekly')return[t.day];
+  if(t.recur==='custom')return t.recurDays||[];
+  return[];
+}
+function recurLabel(t){
+  if(!t.recur||t.recur==='none')return'';
+  if(t.recur==='daily')return'🔄 Hàng ngày';
+  if(t.recur==='weekly')return'🔄 Mỗi '+(DFULL[t.day]||t.day);
+  if(t.recur==='custom')return'🔄 '+(t.recurDays||[]).map(d=>d).join(', ');
+  return'';
+}
+function wtasks(){
+  const wk=wkKey(weekOffset);
+  const regular=tasks.filter(t=>t.weekKey===wk&&(!t.recur||t.recur==='none'));
+  const recurring=tasks.filter(t=>t.recur&&t.recur!=='none').flatMap(t=>
+    recurDays(t).map(d=>{const key=t.recur==='daily'?wk+':'+d:wk;return{...t,day:d,weekKey:wk,done:!!(t.doneMap&&t.doneMap[key])};})
+  );
+  return[...regular,...recurring];
+}
+
+function load(){loadTagLabels();try{const d=localStorage.getItem('ji_tasks_v2');if(d){tasks=JSON.parse(d);const cw=wkKey(0);tasks.forEach(t=>{if(!t.weekKey)t.weekKey=cw;});}}catch{}if(!tasks.length)tasks=seed()}
+function save(){try{localStorage.setItem('ji_tasks_v2',JSON.stringify(tasks))}catch{}}
+function getTag(id){return TAGS.find(t=>t.id===id)||{label:'—',bg:'#F1F1EF',color:'#6B6B68',bar:'#9A9993'}}
+function th(t){return Math.round(t.hours*t.qty*100)/100}
+function dts(d){
+  const wk=wkKey(weekOffset);
+  const regular=tasks.filter(t=>t.day===d&&t.weekKey===wk&&(!t.recur||t.recur==='none'));
+  const recurring=tasks.filter(t=>t.recur&&t.recur!=='none'&&recurDays(t).includes(d)).map(t=>{
+    const key=t.recur==='daily'?wk+':'+d:wk;
+    return{...t,day:d,weekKey:wk,done:!!(t.doneMap&&t.doneMap[key])};
+  });
+  return[...regular,...recurring];
+}
+function dh(d){return Math.round(dts(d).reduce((a,t)=>a+th(t),0)*10)/10}
+function dd(d){return dts(d).filter(t=>t.done).length}
+
+function seed(){const wk=wkKey(0);return[
+  {id:1,name:'Check todaylist',group:'Nhóm 1',day:'T2',hours:0.25,qty:1,deadline:'T2',nature:'Hàng tuần',tag:'nhom1',start:'08:00',done:false},
+  {id:2,name:'Duyệt Outline báo',group:'Phát sinh',day:'T2',hours:0.5,qty:2,deadline:'T3',nature:'Phát sinh',tag:'phatsinh',start:'08:30',done:false},
+  {id:3,name:'Duyệt dàn ý mới',group:'Nhóm 2',day:'T2',hours:0.5,qty:4,deadline:'T2',nature:'Hàng tuần',tag:'nhom2',start:'09:30',done:false},
+  {id:4,name:'Duyệt lại dàn ý',group:'Nhóm 4',day:'T2',hours:0.5,qty:3,deadline:'T3',nature:'Hàng tuần',tag:'nhom4',start:'11:30',done:false},
+  {id:5,name:'Sửa dàn ý',group:'Nhóm 2',day:'T2',hours:0.5,qty:1,deadline:'T4',nature:'Hàng tuần',tag:'nhom2',start:'13:30',done:false},
+  {id:6,name:'Check todaylist',group:'Nhóm 1',day:'T3',hours:0.25,qty:1,deadline:'T3',nature:'Hàng tuần',tag:'nhom1',start:'08:00',done:false},
+  {id:7,name:'Duyệt lại bài viết',group:'Nhóm 2',day:'T3',hours:1,qty:2,deadline:'T3',nature:'Hàng tuần',tag:'nhom2',start:'09:00',done:false},
+  {id:8,name:'Duyệt nội dung trang tĩnh',group:'Phát sinh',day:'T3',hours:0.5,qty:1,deadline:'T2',nature:'Phát sinh',tag:'phatsinh',start:'11:00',done:false},
+  {id:9,name:'Duyệt dàn ý mới',group:'Nhóm 4',day:'T3',hours:1,qty:3,deadline:'T2',nature:'Hàng tuần',tag:'nhom4',start:'13:00',done:false},
+  {id:10,name:'Check todaylist',group:'Nhóm 1',day:'T4',hours:0.25,qty:1,deadline:'T4',nature:'Hàng tuần',tag:'nhom1',start:'08:00',done:false},
+  {id:11,name:'Review dự án',group:'Nhóm 3',day:'T4',hours:1,qty:1,deadline:'T4',nature:'Hàng tuần',tag:'nhom3',start:'09:00',done:false},
+  {id:12,name:'Duyệt lại dàn ý',group:'Nhóm 4',day:'T4',hours:0.5,qty:3,deadline:'T5',nature:'Hàng tuần',tag:'nhom4',start:'10:30',done:false},
+  {id:13,name:'Duyệt bài viết mới',group:'Nhóm 2',day:'T4',hours:1,qty:2,deadline:'T5',nature:'Hàng tuần',tag:'nhom2',start:'13:00',done:false},
+  {id:14,name:'Sửa bài viết',group:'Nhóm 2',day:'T4',hours:0.5,qty:4,deadline:'T5',nature:'Hàng tuần',tag:'nhom2',start:'15:00',done:false},
+  {id:15,name:'Check todaylist',group:'Nhóm 1',day:'T5',hours:0.25,qty:1,deadline:'T5',nature:'Hàng tuần',tag:'nhom1',start:'08:00',done:false},
+  {id:16,name:'Review dự án',group:'Nhóm 3',day:'T5',hours:1,qty:1,deadline:'T5',nature:'Hàng tuần',tag:'nhom3',start:'09:00',done:false},
+  {id:17,name:'Check in nháp',group:'Nhóm 3',day:'T5',hours:1,qty:1,deadline:'T5',nature:'Hàng tuần',tag:'nhom3',start:'10:00',done:false},
+  {id:18,name:'Họp gấp',group:'Phát sinh',day:'T5',hours:1,qty:1,deadline:'T5',nature:'Gấp',tag:'gap',start:'11:00',done:false},
+  {id:19,name:'Training CTV',group:'Nhóm 3',day:'T5',hours:2,qty:1,deadline:'T5',nature:'Hàng tuần',tag:'nhom3',start:'13:00',done:false},
+  {id:20,name:'Sửa dàn ý (cũ)',group:'Nhóm 2',day:'T5',hours:0.15,qty:6,deadline:'T6',nature:'Hàng tuần',tag:'nhom2',start:'15:00',done:false},
+  {id:21,name:'Check todaylist',group:'Nhóm 1',day:'T6',hours:0.25,qty:1,deadline:'T6',nature:'Hàng tuần',tag:'nhom1',start:'08:00',done:false},
+  {id:22,name:'Duyệt dàn ý mới',group:'Nhóm 4',day:'T6',hours:1,qty:2,deadline:'T6',nature:'Hàng tuần',tag:'nhom4',start:'09:00',done:false},
+  {id:23,name:'Duyệt bài viết mới',group:'Nhóm 4',day:'T6',hours:1,qty:2,deadline:'T6',nature:'Hàng tuần',tag:'nhom4',start:'11:00',done:false},
+  {id:24,name:'Sửa bài viết (cũ)',group:'Nhóm 2',day:'T6',hours:0.5,qty:6,deadline:'T6',nature:'Hàng tuần',tag:'nhom2',start:'13:00',done:false},
+  {id:25,name:'Check in',group:'Nhóm 3',day:'T6',hours:0.5,qty:1,deadline:'T6',nature:'Hàng tuần',tag:'nhom3',start:'15:30',done:false},
+  {id:26,name:'Book bài',group:'Nhóm 3',day:'T6',hours:0.25,qty:1,deadline:'T6',nature:'Hàng tuần',tag:'nhom3',start:'16:00',done:false},
+  {id:27,name:'Làm SXCV tuần',group:'Nhóm 1',day:'T6',hours:1,qty:1,deadline:'CN',nature:'Hàng tuần',tag:'nhom1',start:'16:30',done:false},
+].map(t=>({...t,weekKey:wk}))}
+
+/* ── TAG MANAGEMENT (full CRUD) ── */
+const COLOR_PRESETS=[
+  {bg:'#EAF2FF',color:'#1a4a8a',bar:'#2563EB'},
+  {bg:'#EAF5EF',color:'#166534',bar:'#16a34a'},
+  {bg:'#F3F0FF',color:'#4C1D95',bar:'#7C3AED'},
+  {bg:'#FBF4E8',color:'#92400E',bar:'#D97706'},
+  {bg:'#FDF0EE',color:'#9B1C1C',bar:'#DC2626'},
+  {bg:'#FDF2F8',color:'#831843',bar:'#EC4899'},
+  {bg:'#ECFEFF',color:'#164E63',bar:'#0891B2'},
+  {bg:'#FFF7ED',color:'#9A3412',bar:'#F97316'},
+  {bg:'#EEF2FF',color:'#3730A3',bar:'#6366F1'},
+  {bg:'#F0FDFA',color:'#134E4A',bar:'#14B8A6'},
+  {bg:'#FEFCE8',color:'#854D0E',bar:'#CA8A04'},
+  {bg:'#F3F4F6',color:'#374151',bar:'#6B7280'},
+];
+let editTags=[];
+
+function loadTagLabels(){
+  try{
+    const d=localStorage.getItem('ji_tags_v1');
+    if(d){TAGS=JSON.parse(d);return;}
+    const l=localStorage.getItem('ji_tag_labels_v1');
+    if(l){const m=JSON.parse(l);TAGS.forEach(t=>{if(m[t.id])t.label=m[t.id];});}
+  }catch{}
+}
+function saveTagsStore(){try{localStorage.setItem('ji_tags_v1',JSON.stringify(TAGS));}catch{}}
+
+function openTagModal(){
+  editTags=TAGS.map(t=>({...t}));
+  renderTagModal();
+  document.getElementById('tag-modal').classList.add('open');
+}
+function closeTagModal(){document.getElementById('tag-modal').classList.remove('open');}
+
+function renderTagModal(){
+  const svgDel=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>`;
+  const svgPlus=`<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
+  document.getElementById('tag-edit-list').innerHTML=
+    editTags.map((t,i)=>{
+      const used=tasks.filter(x=>x.tag===t.id).length;
+      const selCp=COLOR_PRESETS.findIndex(c=>c.bar===t.bar);
+      const swatches=COLOR_PRESETS.map((c,ci)=>`<div class="cp-swatch${ci===selCp?' sel':''}" style="background:${c.bar}" onclick="selectCp(${i},${ci})"></div>`).join('');
+      return`<div>
+        <div class="tag-edit-row">
+          <button class="tag-swatch-btn" style="background:${t.bg};border:1.5px solid ${t.color}" onclick="toggleCp(${i})" title="Đổi màu"></button>
+          <input class="tag-edit-input" data-idx="${i}" value="${t.label}" maxlength="24" placeholder="Tên nhóm" oninput="editTags[${i}].label=this.value">
+          <span class="tag-use-count">${used?used+' task':''}</span>
+          <button class="tag-del-btn" onclick="deleteEditTag(${i})" ${used?'disabled title="'+used+' task đang dùng"':''}>${svgDel}</button>
+        </div>
+        <div id="cp-${i}" class="cp-row" style="display:none">${swatches}</div>
+      </div>`;
+    }).join('')+
+    `<button class="tag-add-btn" onclick="addEditTag()">${svgPlus} Thêm nhóm mới</button>`;
+}
+
+function toggleCp(i){
+  editTags.forEach((_,j)=>{if(j!==i){const e=document.getElementById('cp-'+j);if(e)e.style.display='none';}});
+  const el=document.getElementById('cp-'+i);
+  if(el)el.style.display=el.style.display==='flex'?'none':'flex';
+}
+function selectCp(i,ci){
+  Object.assign(editTags[i],COLOR_PRESETS[ci]);
+  renderTagModal();
+  const el=document.getElementById('cp-'+i);if(el)el.style.display='flex';
+}
+function deleteEditTag(i){
+  if(tasks.filter(x=>x.tag===editTags[i].id).length)return;
+  editTags.splice(i,1);renderTagModal();
+}
+function addEditTag(){
+  const c=COLOR_PRESETS[editTags.length%COLOR_PRESETS.length];
+  editTags.push({id:'c_'+Date.now(),label:'Nhóm mới',...c});
+  renderTagModal();
+  setTimeout(()=>{const ins=document.querySelectorAll('#tag-edit-list .tag-edit-input');const l=ins[ins.length-1];if(l){l.focus();l.select();}},40);
+}
+function saveTagsFull(){
+  document.querySelectorAll('#tag-edit-list .tag-edit-input').forEach(inp=>{
+    const idx=+inp.dataset.idx;const v=inp.value.trim();
+    if(v&&editTags[idx])editTags[idx].label=v;
+  });
+  TAGS=[...editTags];saveTagsStore();closeTagModal();render();toast('Đã lưu nhóm ✦');
+}
+
+/* ── POMODORO ── */
+const POMO_DUR={work:25*60,short:5*60,long:15*60};
+const POMO_LBL={work:'Làm việc · 25 phút',short:'Nghỉ ngắn · 5 phút',long:'Nghỉ dài · 15 phút'};
+let pomoPhase='work',pomoLeft=POMO_DUR.work,pomoRunning=false,pomoSession=0,pomoTimer=null,pomoTaskId=null;
+
+function openPomoModal(){
+  document.getElementById('pomo-backdrop').classList.add('open');
+  pomoRenderUI();pomoRenderTasks();
+}
+function closePomoModal(){document.getElementById('pomo-backdrop').classList.remove('open');}
+
+function pomoRenderUI(){
+  const m=Math.floor(pomoLeft/60),s=pomoLeft%60;
+  const te=document.getElementById('pomo-time');if(!te)return;
+  te.textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  te.className='pomo-time'+(pomoRunning?' running':'');
+  document.getElementById('pomo-phase-lbl').textContent=POMO_LBL[pomoPhase];
+  const sb=document.getElementById('pomo-start'),pb=document.getElementById('pomo-pause');
+  document.getElementById('pomo-dots').innerHTML=Array.from({length:4},(_,i)=>`<div class="pomo-dot${i<pomoSession%4?' done':''}"></div>`).join('');
+  document.getElementById('pomo-prog').style.width=`${Math.round((1-pomoLeft/POMO_DUR[pomoPhase])*100)}%`;
+  const t=pomoTaskId?tasks.find(x=>x.id===pomoTaskId):null;
+  const cur=document.getElementById('pomo-task-current');
+  if(cur){cur.textContent=t?'⚡ '+t.name:'Chọn task bên dưới để bắt đầu';cur.className='pomo-task-current'+(t?'':' empty');}
+  ['work','short','long'].forEach(p=>{const el=document.getElementById('pomo-ph-'+p);if(el)el.classList.toggle('active',p===pomoPhase);});
+  const fab=document.getElementById('pomo-fab');if(fab)fab.style.animation=pomoRunning?'pomoPulse 2s ease-in-out infinite':'none';
+}
+function pomoRenderTasks(){
+  const list=document.getElementById('pomo-task-list');if(!list)return;
+  const dayTasks=dts(activeDay).filter(t=>!t.done);
+  list.innerHTML=dayTasks.length
+    ?dayTasks.map(t=>`<div class="pomo-task-item${t.id===pomoTaskId?' active':''}" onclick="pomoSelectTask(${t.id})"><div class="pomo-task-bullet"></div><span>${t.name}</span></div>`).join('')
+    :`<div class="pomo-task-empty">Không có task nào hôm nay</div>`;
+}
+function pomoSelectTask(id){pomoTaskId=id;pomoRenderUI();pomoRenderTasks();}
+function pomoAddTask(){
+  const inp=document.getElementById('pomo-add-input');
+  const name=inp.value.trim();
+  inp.value='';
+  if(!name)return;
+  const id=Date.now();
+  tasks.push({id,name,day:activeDay,weekKey:wkKey(weekOffset),tag:TAGS[0]?.id||'',done:false,time:''});
+  save();pomoTaskId=id;
+  pomoRenderUI();pomoRenderTasks();render();
+}
+function pomoTick(){
+  if(!pomoRunning)return;
+  pomoLeft--;
+  if(pomoLeft<=0){
+    pomoRunning=false;clearInterval(pomoTimer);pomoTimer=null;
+    if(pomoPhase==='work')pomoSession++;
+    toast(pomoPhase==='work'?'🍅 Xong 1 pomodoro! Nghỉ thôi':'☕ Nghỉ xong, làm việc tiếp nào!');
+    const next=pomoPhase==='work'?(pomoSession%4===0?'long':'short'):'work';
+    pomoSetPhase(next);return;
+  }
+  pomoRenderUI();
+}
+function pomoStart(){if(!pomoRunning){pomoRunning=true;pomoTimer=setInterval(pomoTick,1000);pomoRenderUI();}}
+function pomoPause(){if(pomoRunning){pomoRunning=false;clearInterval(pomoTimer);pomoTimer=null;pomoRenderUI();}}
+function pomoReset(){pomoRunning=false;clearInterval(pomoTimer);pomoTimer=null;pomoLeft=POMO_DUR[pomoPhase];pomoRenderUI();}
+function pomoSkip(){pomoRunning=false;clearInterval(pomoTimer);pomoTimer=null;const next=pomoPhase==='work'?(pomoSession%4===0?'long':'short'):'work';pomoSetPhase(next);}
+function pomoSetPhase(p){pomoRunning=false;clearInterval(pomoTimer);pomoTimer=null;pomoPhase=p;pomoLeft=POMO_DUR[p];pomoRenderUI();}
+function startPomoTask(id){
+  event.stopPropagation();
+  pomoTaskId=id;pomoPhase='work';pomoLeft=POMO_DUR.work;
+  pomoRunning=false;clearInterval(pomoTimer);pomoTimer=null;
+  openPomoModal();
+  setTimeout(pomoStart,80);
+}
+
+/* SVG icons */
+const IC={
+  chk:`<svg viewBox="0 0 24 24" width="9" height="9" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`,
+  del:`<svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>`,
+  cal:`<svg viewBox="0 0 24 24" width="32" height="32" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`,
+  clk:`<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
+  flg:`<svg viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>`,
+};
+
+function render(){renderSidebar();renderMain()}
+
+function renderSidebar(){
+  const nav=document.getElementById('day-nav');
+  const isCurrentWeek=weekOffset===0;
+  nav.innerHTML=DAYS.map(d=>{
+    const cnt=dts(d).length,dn=dd(d),isT=isCurrentWeek&&d===TODAY,isA=d===activeDay;
+    return`<button class="day-btn${isA?' active':''}${isT?' today':''}" onclick="selDay('${d}')">
+      <span>${DFULL[d]}${isT?'<span class="today-mark"></span>':''} <span style="font-size:10px;font-weight:400;opacity:0.55">${dayLabel(d,weekOffset)}</span></span>
+      ${cnt?`<span class="pill">${dn}/${cnt}</span>`:''}
+    </button>`;
+  }).join('');
+  const wt=wtasks(),tot=wt.length,dn=wt.filter(t=>t.done).length,hrs=Math.round(wt.reduce((a,t)=>a+th(t),0)*10)/10;
+  document.getElementById('sidebar-bottom').innerHTML=`
+    <div class="sidebar-stat-row"><span class="sk">Task tuần</span><span class="sv">${dn} / ${tot}</span></div>
+    <div class="sidebar-stat-row"><span class="sk">Tổng giờ</span><span class="sv">${hrs}h</span></div>
+    <div class="sidebar-stat-row"><span class="sk">Hoàn thành</span><span class="sv">${tot?Math.round(dn/tot*100):0}%</span></div>
+    <button class="sidebar-mgr-btn" onclick="openTagModal()"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Quản lý nhóm</button>`;
+  const ws=getWeekStart(weekOffset),we=new Date(ws);we.setDate(ws.getDate()+6);
+  const lbl=`${ws.getDate()}/${ws.getMonth()+1} – ${we.getDate()}/${we.getMonth()+1}/${we.getFullYear()}`;
+  document.getElementById('week-label').textContent=lbl;
+  const tw=document.getElementById('today-wrap');
+  if(tw)tw.innerHTML=!isCurrentWeek?`<button class="btn" onclick="goToday()" style="font-size:12px;padding:4px 12px">Hôm nay</button>`:'';
+}
+
+function renderMain(){
+  document.querySelectorAll('.view-tab').forEach((el,i)=>el.classList.toggle('active',['all','day','blocker','dash'][i]===view));
+  const selBtn=document.getElementById('select-mode-btn');if(selBtn)selBtn.style.display=(view==='day'||view==='all')?'':'none';
+  const c=document.getElementById('main-scroll');
+  if(view==='day')c.innerHTML=renderDay();
+  else if(view==='blocker')c.innerHTML=renderBlocker();
+  else if(view==='all')c.innerHTML=renderAllTasks();
+  else c.innerHTML=renderDash();
+  if(view==='blocker')populateBlocks();
+}
+
+function renderDay(){
+  const all=dts(activeDay),fil=filterTag?all.filter(t=>t.tag===filterTag):all;
+  const hrs=dh(activeDay),dn=dd(activeDay);
+  const DAY_TARGET=9;
+  const tagHrs={};for(const t of all)tagHrs[t.tag]=(tagHrs[t.tag]||0)+th(t);
+  let segs='',breakdown='';
+  for(const tg of TAGS){const h=Math.round((tagHrs[tg.id]||0)*100)/100;if(!h)continue;const w=Math.min(h/DAY_TARGET*100,100);segs+=`<div class="prog-seg" style="width:${w}%;background:${tg.bar}"></div>`;breakdown+=`<span class="pbd"><span class="pbd-dot" style="background:${tg.bar}"></span>${tg.label} ${h}h</span>`;}
+  if(hrs>=DAY_TARGET&&segs)segs=segs.replace(/background:[^"]+(?="[^>]*><\/div>)/,'background:var(--green)');
+  const tagsIn=[...new Set(all.map(t=>t.tag))];
+  let chips=`<div class="filters"><button class="fchip${!filterTag?' on':''}" onclick="setFilter(null)">Tất cả</button>`;
+  for(const tid of tagsIn){const tg=getTag(tid);const on=filterTag===tid;chips+=`<button class="fchip${on?' on':''}" style="${on?`background:${tg.bg};color:${tg.color};border-color:${tg.bar}`:''}" onclick="setFilter('${tid}')">${tg.label}</button>`;}
+  chips+='</div>';
+  const grps={};for(const t of fil){const k=getTag(t.tag).label;(grps[k]=grps[k]||[]).push(t);}
+  let body='';
+  if(!fil.length){body=`<div class="empty">${IC.cal}<p>Không có task${filterTag?' với tag này':''} —</p></div>`;}
+  else{for(const[g,gt]of Object.entries(grps)){
+    body+=`<div class="group-sec"><div class="group-lbl">${g}</div><div class="task-stack">`;
+    const wk=wkKey(weekOffset);
+    for(const t of gt){const tg=getTag(t.tag);const h=th(t);const isSel=selectMode&&selected.has(t.id);const rl=recurLabel(t);
+      body+=`<div class="task-row${t.done?' done':''}${isSel?' selected':''}" data-tid="${t.id}"
+        ${selectMode?`onclick="toggleSelect(${t.id},event)" style="cursor:pointer"`:
+          `ondblclick="openTaskModal(${t.id})"`}>
+        ${selectMode?`<div class="sel-chk${isSel?' on':''}">${isSel?'✓':''}</div>`:''}
+        <div class="chk${t.done?' on':''}" ${selectMode?'':'onclick="toggle('+t.id+',\''+activeDay+'\',\''+wk+'\')" ondblclick="event.stopPropagation()"'} role="checkbox" aria-checked="${t.done}" tabindex="0">${t.done?IC.chk:''}</div>
+        <div class="task-body">
+          <div class="task-top">
+            <span class="task-name">${t.name}${t.qty>1?` ×${t.qty}`:''}</span>
+            <span class="tag" style="background:${tg.bg};color:${tg.color}">${tg.label}</span>
+          </div>
+          <div class="task-meta">
+            <span>${IC.clk} ${h}h</span>
+            ${t.start?`<span>${t.start}</span>`:''}
+            ${t.deadline?`<span>${IC.flg} ${DFULL[t.deadline]}</span>`:''}
+            ${rl?`<span class="recur-tag">${rl}</span>`:''}
+          </div>
+          ${t.desc?`<div class="task-output" style="color:var(--purple);font-style:normal">📎 ${t.desc}</div>`:''}
+          ${t.output?`<div class="task-output">↳ ${t.output}</div>`:''}
+        </div>
+        ${selectMode?'':
+          `<button class="task-play" onclick="startPomoTask(${t.id})" ondblclick="event.stopPropagation()" title="Bắt đầu Pomodoro"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></button>
+           <button class="del" onclick="delTask(${t.id})" ondblclick="event.stopPropagation()" aria-label="Xoá">${IC.del}</button>`}
+      </div>`;
+    }
+    body+='</div></div>';
+  }}
+  return`<div class="day-head"><h2>${DFULL[activeDay]} <span style="font-size:14px;font-weight:500;color:var(--ink3)">${dayLabel(activeDay,weekOffset)}${activeDay===TODAY&&weekOffset===0?' — hôm nay':''}</span></h2><div class="day-sub">${dn}/${all.length} xong · ${hrs}h</div></div>
+  <div class="prog-row"><div class="prog-track">${segs}</div><span class="prog-label">${hrs}h / ${DAY_TARGET}h</span></div>
+  ${breakdown?`<div class="prog-breakdown">${breakdown}</div>`:''}
+  ${chips}${body}`;
+}
+
+function renderBlocker(){
+  const gH=(DE-DS)*HP;
+  let hcells='<div class="bh" style="font-size:9px;color:var(--ink3);text-align:right;padding-right:3px"></div>';
+  for(const d of DAYS)hcells+=`<div class="bh${d===TODAY?' today':''}">${DFULL[d].replace('Thứ ','T')}</div>`;
+  let tcol='';for(const h of HOURS)tcol+=`<div class="t-cell">${h}:00</div>`;
+  let dcols='';
+  for(const d of DAYS){
+    let lines='';
+    for(let i=0;i<HOURS.length;i++){lines+=`<div class="h-line" style="top:${i*HP}px"></div>`;if(i<HOURS.length-1)lines+=`<div class="h-half" style="top:${i*HP+HP/2}px"></div>`;}
+    dcols+=`<div class="d-col" id="col-${d}" style="height:${gH}px" ondblclick="addFromCol('${d}',event)">${lines}</div>`;
+  }
+  return`<p class="blocker-hint">Double-click vào cột để thêm task · Click block để xem chi tiết</p>
+  <div class="blocker-scroll">
+    <div class="b-grid">
+      <div class="b-head">${hcells}</div>
+      <div class="b-body"><div class="t-col">${tcol}</div>${dcols}</div>
+    </div>
+  </div>`;
+}
+
+function populateBlocks(){
+  for(const d of DAYS){
+    const col=document.getElementById('col-'+d);if(!col)continue;
+    col.querySelectorAll('.block').forEach(e=>e.remove());
+    const dt=[...dts(d)].sort((a,b)=>(a.start||'').localeCompare(b.start||''));
+    for(const t of dt){
+      if(!t.start)continue;
+      const[sh,sm]=t.start.split(':').map(Number);
+      const sm2=(sh-DS)*60+sm,dmin=Math.round(th(t)*60);
+      const top=sm2/60*HP,ht=Math.max(18,dmin/60*HP);
+      if(top<0||top>=(DE-DS)*HP)continue;
+      const tg=getTag(t.tag);
+      const bl=document.createElement('button');
+      bl.className='block';
+      bl.style.cssText=`top:${top}px;height:${ht}px;background:${tg.bg};color:${tg.color};border-left:3px solid ${tg.bar}`;
+      bl.innerHTML=`<div class="bn">${t.name}${t.qty>1?` ×${t.qty}`:''}</div>${ht>28?`<div class="bd">${t.deadline?'⏰ '+t.deadline:th(t)+'h'}</div>`:''}`;
+      if(t.done)bl.classList.add('done-blk');
+      bl.onclick=()=>openBlockDetail(t.id,d);
+      col.appendChild(bl);
+    }
+  }
+  const now=new Date(),cm=(now.getHours()-DS)*60+now.getMinutes();
+  if(weekOffset===0&&cm>=0&&cm<(DE-DS)*60){
+    const col=document.getElementById('col-'+TODAY);
+    if(col){const ln=document.createElement('div');ln.className='now-line';ln.style.top=(cm/60*HP)+'px';ln.innerHTML='<div class="now-dot"></div>';col.appendChild(ln);}
+  }
+}
+
+function renderAllTasks(){
+  const base=wtasks(),fil=filterTag?base.filter(t=>t.tag===filterTag):base;
+  const tagsIn=[...new Set(base.map(t=>t.tag))];
+  let chips=`<div class="filters"><button class="fchip${!filterTag?' on':''}" onclick="setFilter(null)">Tất cả</button>`;
+  for(const tid of tagsIn){const tg=getTag(tid);const on=filterTag===tid;chips+=`<button class="fchip${on?' on':''}" style="${on?`background:${tg.bg};color:${tg.color};border-color:${tg.bar}`:''}" onclick="setFilter('${tid}')">${tg.label}</button>`;}
+  chips+='</div>';
+  let body='';
+  if(!fil.length){body=`<div class="empty">${IC.cal}<p>Không có task${filterTag?' với tag này':''}</p></div>`;}
+  else{
+    for(const d of DAYS){
+      const dt=fil.filter(t=>t.day===d);if(!dt.length)continue;
+      const dn2=dt.filter(t=>t.done).length;
+      body+=`<div class="group-sec"><div class="group-lbl" style="font-size:11px;color:var(--ink2);font-weight:600;letter-spacing:0.04em">${DFULL[d]}${d===TODAY?' — hôm nay':''} <span style="font-weight:400;color:var(--ink3)">${dn2}/${dt.length} xong</span></div><div class="task-stack">`;
+      const wk=wkKey(weekOffset);
+      for(const t of dt){const tg=getTag(t.tag);const h=th(t);const isSel=selectMode&&selected.has(t.id);const rl=recurLabel(t);
+        body+=`<div class="task-row${t.done?' done':''}${isSel?' selected':''}" data-tid="${t.id}"
+          ${selectMode?`onclick="toggleSelect(${t.id},event)" style="cursor:pointer"`:
+            `ondblclick="openTaskModal(${t.id})"`}>
+          ${selectMode?`<div class="sel-chk${isSel?' on':''}">${isSel?'✓':''}</div>`:''}
+          <div class="chk${t.done?' on':''}" ${selectMode?'':'onclick="toggle('+t.id+',\''+d+'\',\''+wk+'\')" ondblclick="event.stopPropagation()"'} role="checkbox" aria-checked="${t.done}" tabindex="0">${t.done?IC.chk:''}</div>
+          <div class="task-body">
+            <div class="task-top">
+              <span class="task-name">${t.name}${t.qty>1?` ×${t.qty}`:''}</span>
+              <span class="tag" style="background:${tg.bg};color:${tg.color}">${tg.label}</span>
+            </div>
+            <div class="task-meta">
+              <span>${IC.clk} ${h}h</span>
+              ${t.start?`<span>${t.start}</span>`:''}
+              ${t.deadline?`<span>${IC.flg} ${DFULL[t.deadline]}</span>`:''}
+              ${rl?`<span class="recur-tag">${rl}</span>`:''}
+            </div>
+            ${t.desc?`<div class="task-output" style="color:var(--purple);font-style:normal">📎 ${t.desc}</div>`:''}
+            ${t.output?`<div class="task-output">↳ ${t.output}</div>`:''}
+          </div>
+          ${selectMode?'':`<button class="del" onclick="delTask(${t.id})" ondblclick="event.stopPropagation()" aria-label="Xoá">${IC.del}</button>`}
+        </div>`;
+      }
+      body+='</div></div>';
+    }
+  }
+  const tot=fil.length,dn=fil.filter(t=>t.done).length,hrs=Math.round(fil.reduce((a,t)=>a+th(t),0)*10)/10;
+  return`<div class="day-head"><h2>Tất cả task</h2><div class="day-sub">${dn}/${tot} xong · ${hrs}h</div></div>${chips}${body}`;
+}
+
+function renderDash(){
+  const wt=wtasks();
+  const tot=wt.length,dn=wt.filter(t=>t.done).length,pct=tot?Math.round(dn/tot*100):0;
+  const allWks=new Set(tasks.map(t=>t.weekKey));
+  let streak=0;for(let o=0;o>=-104;o--){if(allWks.has(getWeekStart(o).toISOString().slice(0,10)))streak++;else break;}
+  const tH=Math.round(wt.reduce((a,t)=>a+th(t),0)*10)/10;
+  const dH=Math.round(wt.filter(t=>t.done).reduce((a,t)=>a+th(t),0)*10)/10;
+  const remH=Math.round(wt.filter(t=>!t.done).reduce((a,t)=>a+th(t),0)*10)/10;
+  const bestDay=DAYS.map(d=>({d,h:Math.round(dts(d).filter(t=>t.done).reduce((a,t)=>a+th(t),0)*10)/10})).reduce((a,b)=>a.h>=b.h?a:b,{d:null,h:0});
+  let stats=`<div class="stats-grid">
+    <div class="sc"><div class="sc-lbl">Hoàn thành</div><div class="sc-val">${dn}<sup>/${tot}</sup></div><div class="sc-sub">task tuần này</div></div>
+    <div class="sc"><div class="sc-lbl">Tiến độ</div><div class="sc-val">${pct}<sup>%</sup></div><div class="sc-sub">theo task</div></div>
+    <div class="sc"><div class="sc-lbl">Giờ xong</div><div class="sc-val">${dH}<sup>/${tH}h</sup></div><div class="sc-sub">trong tuần</div></div>
+    <div class="sc"><div class="sc-lbl">Còn lại</div><div class="sc-val" style="color:${remH>0?'var(--ink)':'var(--green)'}">${remH}<sup>h</sup></div><div class="sc-sub">cần hoàn thành</div></div>
+    <div class="sc"><div class="sc-lbl">Streak</div><div class="sc-val" style="color:var(--purple)">${streak}<sup>tuần</sup></div><div class="sc-sub">liên tiếp có task</div></div>
+  </div>`;
+  const doneH=d=>Math.round(dts(d).filter(t=>t.done).reduce((a,t)=>a+th(t),0)*10)/10;
+  const maxH=Math.max(...DAYS.map(d=>doneH(d)),1);
+  let bars='';
+  for(const d of DAYS){const h=doneH(d),dn2=dd(d),tc=dts(d).length,p=Math.round(h/maxH*100),all=dn2===tc&&tc>0;
+    bars+=`<div class="bar-row"><span class="bar-lbl">${DFULL[d].replace('Thứ ','T')}</span><div class="bar-track"><div class="bar-fill${all?' done':''}" style="width:${p}%"></div></div><span class="bar-val">${h}h</span></div>`;}
+  const ts=TAGS.map(tag=>{const tl=wt.filter(t=>t.tag===tag.id);const dl=tl.filter(t=>t.done);return{...tag,cnt:tl.length,done:dl.length,hrs:Math.round(tl.reduce((a,t)=>a+th(t),0)*10)/10,doneHrs:Math.round(dl.reduce((a,t)=>a+th(t),0)*10)/10};}).filter(t=>t.cnt>0);
+  const topTag=ts.length?ts.reduce((a,b)=>a.doneHrs>=b.doneHrs?a:b):null;
+  const topCard=topTag?`<div class="sc dash-ins"><div class="sc-lbl">Dành nhiều thời gian nhất cho</div><div style="margin:6px 0 4px"><span class="tag" style="background:${topTag.bg};color:${topTag.color}">${topTag.label}</span></div><div class="sc-sub">${topTag.doneHrs}h đã xong · ${topTag.done}/${topTag.cnt} task</div></div>`:'';
+  const bestCard=bestDay.h>0?`<div class="sc dash-ins"><div class="sc-lbl">Ngày năng suất nhất</div><div style="margin:6px 0 4px;font-size:18px;font-weight:800;color:var(--ink);letter-spacing:-0.02em">${DFULL[bestDay.d]}</div><div class="sc-sub">${bestDay.h}h đã hoàn thành</div></div>`:'';
+  const outputTexts=wt.filter(t=>t.done&&t.output&&t.output.trim());
+  const outputLines=outputTexts.length
+    ?outputTexts.map(t=>`<div class="out-line"><span class="out-done">✓</span>${t.output}</div>`).join('')
+    :`<p class="out-empty">Hoàn thành task và điền output để xem</p>`;
+  const outputCard=`<div class="sc dash-ins dash-out-card"><div class="sc-lbl" style="margin-bottom:8px">Output tuần này</div>${outputLines}</div>`;
+  const insightRow=`<div class="dash-insight-row">${topCard}${bestCard}${outputCard}</div>`;
+  let tagRows='';
+  for(const t of ts){const p=t.cnt?Math.round(t.done/t.cnt*100):0;
+    tagRows+=`<div class="tag-row"><span class="tag" style="background:${t.bg};color:${t.color};min-width:76px;text-align:center">${t.label}</span><div class="tag-bar"><div class="tag-fill" style="width:${p}%;background:${t.bar}"></div></div><span class="tag-meta">${t.done}/${t.cnt} · ${t.hrs}h</span></div>`;}
+  return`${stats}${insightRow}<div class="dash-h" style="margin-bottom:10px">Giờ theo ngày</div>${bars}<div class="dash-h" style="margin:20px 0 10px">Tiến độ theo nhóm</div><div>${tagRows||'<p style="font-size:13px;color:var(--ink3)">Chưa có dữ liệu</p>'}</div>`;
+}
+
+/* ── CONFIRM DIALOG ── */
+let _confirmCb=null;
+function showConfirm(title,msg,okLabel,cb){
+  document.getElementById('confirm-title').textContent=title;
+  document.getElementById('confirm-msg').textContent=msg;
+  const okBtn=document.getElementById('confirm-ok-btn');
+  okBtn.textContent=okLabel;
+  okBtn.style.cssText='min-width:90px;color:var(--red);border-color:var(--red)';
+  _confirmCb=cb;
+  document.getElementById('confirm-modal').classList.add('open');
+}
+function confirmCancel(){document.getElementById('confirm-modal').classList.remove('open');_confirmCb=null;}
+function confirmOk(){document.getElementById('confirm-modal').classList.remove('open');if(_confirmCb)_confirmCb();_confirmCb=null;}
+
+/* ── ACTIONS ── */
+function onRecurChange(){
+  const recur=document.getElementById('f-recur').value;
+  document.getElementById('recur-days-wrap').style.display=recur==='custom'?'flex':'none';
+  const day=document.getElementById('f-day').value;
+  const wkOpt=document.querySelector('#f-recur option[value="weekly"]');
+  if(wkOpt)wkOpt.textContent='Hàng tuần vào '+(DFULL[day]||day);
+}
+function toggleSelectMode(){
+  selectMode=!selectMode;selected.clear();
+  const btn=document.getElementById('select-mode-btn');
+  if(btn)btn.textContent=selectMode?'✓ Xong':'Chọn nhiều';
+  const bar=document.getElementById('select-bar');if(bar)bar.style.display='none';
+  renderMain();
+}
+function toggleSelect(id,e){
+  if(e)e.stopPropagation();
+  if(selected.has(id))selected.delete(id);else selected.add(id);
+  const bar=document.getElementById('select-bar');
+  if(bar){bar.style.display=selected.size?'flex':'none';const lbl=document.getElementById('sel-count');if(lbl)lbl.textContent=`Đã chọn ${selected.size} task`;}
+  document.querySelectorAll(`.task-row[data-tid="${id}"]`).forEach(r=>{r.classList.toggle('selected',selected.has(id));const chk=r.querySelector('.sel-chk');if(chk)chk.classList.toggle('on',selected.has(id));if(chk)chk.textContent=selected.has(id)?'✓':'';});
+}
+function bulkDelete(){
+  if(!selected.size)return;
+  showConfirm(`Xoá ${selected.size} task?`,'Hành động này không thể hoàn tác.',`Xoá ${selected.size} task`,()=>{
+    tasks=tasks.filter(t=>!selected.has(t.id));selected.clear();selectMode=false;
+    const btn=document.getElementById('select-mode-btn');if(btn)btn.textContent='Chọn nhiều';
+    const bar=document.getElementById('select-bar');if(bar)bar.style.display='none';
+    save();render();
+  });
+}
+function setView(v){view=v;render()}
+function selDay(d){activeDay=d;view='day';render()}
+function navWeek(dir){weekOffset+=dir;if(weekOffset===0)activeDay=TODAY;render();}
+function goToday(){weekOffset=0;activeDay=TODAY;view='day';render();}
+function setFilter(t){filterTag=t;renderMain()}
+function toggle(id,d,wk){
+  const t=tasks.find(x=>x.id===id);if(!t)return;
+  if(t.recur&&t.recur!=='none'){
+    if(!t.doneMap)t.doneMap={};
+    const wd=wk||wkKey(weekOffset),dd2=d||t.day;
+    const key=t.recur==='daily'?wd+':'+dd2:wd;
+    const now=!t.doneMap[key];t.doneMap[key]=now;
+    save();render();if(now)launchConfetti();
+  }else{
+    t.done=!t.done;save();render();if(t.done)launchConfetti();
+  }
+}
+
+function launchConfetti(){
+  const cv=document.getElementById('confetti-canvas');
+  cv.width=innerWidth;cv.height=innerHeight;cv.style.display='block';
+  const ctx=cv.getContext('2d');
+  const cols=['#9039FF','#2563EB','#16a34a','#F97316','#EC4899','#0891B2','#CA8A04','#EF4444'];
+  const ps=Array.from({length:90},()=>({
+    x:Math.random()*innerWidth,y:Math.random()*innerHeight*0.4-innerHeight*0.1,
+    w:Math.random()*8+4,h:Math.random()*5+3,
+    vx:(Math.random()-0.5)*7,vy:Math.random()*4+1,
+    rot:Math.random()*360,rotV:(Math.random()-0.5)*12,
+    c:cols[Math.floor(Math.random()*cols.length)],a:1
+  }));
+  let raf;
+  function draw(){
+    ctx.clearRect(0,0,cv.width,cv.height);
+    let live=false;
+    for(const p of ps){
+      p.x+=p.vx;p.y+=p.vy;p.vy+=0.18;p.rot+=p.rotV;p.a-=0.013;
+      if(p.a>0){live=true;ctx.save();ctx.globalAlpha=p.a;ctx.fillStyle=p.c;
+        ctx.translate(p.x,p.y);ctx.rotate(p.rot*Math.PI/180);
+        ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);ctx.restore();}
+    }
+    if(live)raf=requestAnimationFrame(draw);else cv.style.display='none';
+  }
+  cancelAnimationFrame(raf);draw();
+}
+function delTask(id){showConfirm('Xoá task này?','Hành động này không thể hoàn tác.','Xoá task',()=>{tasks=tasks.filter(t=>t.id!==id);save();render();});}
+
+function openTaskModal(id){
+  editId=id||null;
+  document.getElementById('modal-title').textContent=editId?'Sửa task':'Thêm task mới';
+  const t=editId?tasks.find(x=>x.id===editId):null;
+  document.getElementById('f-name').value=t?t.name:'';
+  document.getElementById('f-day').value=t?t.day:activeDay;
+  document.getElementById('f-hours').value=t?t.hours:0.5;
+  document.getElementById('f-qty').value=t?t.qty:1;
+  document.getElementById('f-deadline').value=t?t.deadline:'';
+  document.getElementById('f-start').value=t?t.start:'09:00';
+  const recur=t?t.recur||'none':'none';
+  document.getElementById('f-recur').value=recur;
+  document.querySelectorAll('.recur-day-chk').forEach(cb=>{cb.checked=!!(t&&t.recurDays&&t.recurDays.includes(cb.value));});
+  onRecurChange();
+  document.getElementById('f-desc').value=t?t.desc||'':'';
+  document.getElementById('f-output').value=t?t.output||'':'';
+  selTag=t?t.tag:'nhom1';renderTP();
+  document.getElementById('task-modal').classList.add('open');
+  setTimeout(()=>document.getElementById('f-name').focus(),50);
+}
+function addFromCol(d,e){
+  const col=document.getElementById('col-'+d);if(!col)return;
+  const r=col.getBoundingClientRect(),y=e.clientY-r.top;
+  const hr=Math.floor(y/HP)+DS,mn=Math.round((y%HP)/HP*60/15)*15;
+  openTaskModal();
+  document.getElementById('f-day').value=d;
+  document.getElementById('f-start').value=`${String(hr).padStart(2,'0')}:${String(mn).padStart(2,'0')}`;
+}
+function closeTaskModal(){document.getElementById('task-modal').classList.remove('open');editId=null;selTag=null}
+function renderTP(){document.getElementById('tag-picker').innerHTML=TAGS.map(t=>`<span class="tpchip${selTag===t.id?' sel':''}" style="background:${t.bg};color:${t.color}" onclick="selTagFn('${t.id}')">${t.label}</span>`).join('')}
+function selTagFn(id){selTag=id;renderTP()}
+function saveTask(){
+  const name=document.getElementById('f-name').value.trim();
+  if(!name){alert('Vui lòng nhập tên task');return}
+  const recur=document.getElementById('f-recur').value;
+  const recurDaysVal=[...document.querySelectorAll('.recur-day-chk:checked')].map(cb=>cb.value);
+  const data={name,day:document.getElementById('f-day').value,hours:parseFloat(document.getElementById('f-hours').value)||0.5,qty:parseInt(document.getElementById('f-qty').value)||1,deadline:document.getElementById('f-deadline').value,start:document.getElementById('f-start').value,recur,recurDays:recur==='custom'?recurDaysVal:[],tag:selTag||'nhom1',weekKey:wkKey(weekOffset),desc:document.getElementById('f-desc').value.trim(),output:document.getElementById('f-output').value.trim()};
+  if(editId){const t=tasks.find(x=>x.id===editId);if(t)Object.assign(t,data);}
+  else tasks.push({id:Date.now(),...data,done:false});
+  save();closeTaskModal();render();toast('Đã lưu ✦');
+}
+
+function openBlockDetail(id,day){
+  blockId=id;blockDay=day||null;blockWk=wkKey(weekOffset);
+  const tmpl=tasks.find(x=>x.id===id);if(!tmpl)return;
+  let t=tmpl;
+  if(tmpl.recur&&tmpl.recur!=='none'&&day){
+    const key=tmpl.recur==='daily'?blockWk+':'+day:blockWk;
+    t={...tmpl,day,done:!!(tmpl.doneMap&&tmpl.doneMap[key])};
+  }
+  const tg=getTag(t.tag);
+  const rl=recurLabel(tmpl);
+  document.getElementById('bm-title').textContent=t.name+(t.qty>1?` ×${t.qty}`:'');
+  document.getElementById('bm-body').innerHTML=`<span class="tag" style="background:${tg.bg};color:${tg.color}">${tg.label}</span>${rl?` <span class="recur-tag">${rl}</span>`:''}<br>${DFULL[t.day]} · ${t.start||'—'}<br>Deadline: ${t.deadline?DFULL[t.deadline]:'—'}${t.desc?'<br><br><span style="font-size:11px;color:var(--ink3);font-weight:600;text-transform:uppercase;letter-spacing:0.05em">Mô tả</span><br><span style="font-size:13px;color:var(--ink2);white-space:pre-wrap">'+t.desc+'</span>':''}${t.output?'<br><br><span style="font-size:11px;color:var(--ink3);font-weight:600;text-transform:uppercase;letter-spacing:0.05em">Output</span><br><span style="font-size:13px;color:var(--ink2)">'+t.output+'</span>':''}`;
+  document.getElementById('bm-toggle').textContent=t.done?'Đánh dấu chưa xong':'Xong ✦';
+  document.getElementById('block-modal').classList.add('open');
+}
+function closeBlockModal(){document.getElementById('block-modal').classList.remove('open');blockId=null}
+function editFromBlock(){const id=blockId;closeBlockModal();openTaskModal(id);}
+function toggleFromBlock(){
+  if(!blockId)return;
+  const t=tasks.find(x=>x.id===blockId);
+  if(t&&t.recur&&t.recur!=='none'){toggle(blockId,blockDay||t.day,blockWk||wkKey(weekOffset));}
+  else{toggle(blockId);}
+  closeBlockModal();
+}
+function deleteFromBlock(){if(!blockId)return;showConfirm('Xoá task này?','Hành động này không thể hoàn tác.','Xoá task',()=>{tasks=tasks.filter(t=>t.id!==blockId);save();closeBlockModal();render();});}
+
+function toast(msg){const e=document.getElementById('toast');e.textContent=msg;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),2000)}
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){confirmCancel();closePomoModal();closeTaskModal();closeBlockModal();closeTagModal();}
+  if(e.key==='n'&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName))openTaskModal();
+});
+
+load();render();
+</script>
+<div class="select-bar" id="select-bar">
+  <span id="sel-count">Đã chọn 0 task</span>
+  <button class="sb-del" onclick="bulkDelete()">Xoá</button>
+  <button class="sb-cancel" onclick="toggleSelectMode()">Thoát</button>
+</div>
+</body>
+</html>
