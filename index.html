@@ -202,7 +202,14 @@ body{font-family:var(--sans);background:var(--cream);color:var(--ink);min-height
 .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;padding-top:16px;border-top:1px solid var(--border)}
 .tp{display:flex;gap:6px;flex-wrap:wrap}
 .tpchip{font-size:12px;font-weight:700;padding:3px 10px;border-radius:3px;cursor:pointer;border:2px solid transparent;transition:all 0.1s;font-family:var(--sans)}
-.tpchip.sel{transform:scale(1.06);font-weight:800}
+.tpchip.sel{box-shadow:0 0 0 1px var(--ink);font-weight:800}
+.tpchip-add{font-size:12px;font-weight:600;padding:3px 10px;border-radius:3px;cursor:pointer;border:1.5px dashed var(--border2);background:none;color:var(--ink3);font-family:var(--sans);transition:all 0.1s}
+.tpchip-add:hover{border-color:var(--ink2);color:var(--ink)}
+.itc{margin-top:8px;padding:10px;background:var(--cream);border-radius:var(--radius);border:1px solid var(--border);display:flex;flex-direction:column;gap:8px}
+.itc-row{display:flex;gap:6px;align-items:center}
+.itc-colors{display:flex;gap:4px;flex-wrap:wrap}
+.itc-swatch{width:18px;height:18px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all 0.1s}
+.itc-swatch.sel{border-color:var(--ink);transform:scale(1.2)}
 
 /* block detail modal */
 .bm-body{font-size:13px;font-weight:500;color:var(--ink2);line-height:2;margin-bottom:4px}
@@ -404,6 +411,14 @@ body{font-family:var(--sans);background:var(--cream);color:var(--ink);min-height
     <div class="frow">
       <label>Nhóm công việc</label>
       <div class="tp" id="tag-picker"></div>
+      <div class="itc" id="itc-panel" style="display:none">
+        <div class="itc-row">
+          <input id="itc-name" placeholder="Tên nhóm..." style="flex:1;padding:5px 8px;border:1px solid var(--border2);border-radius:var(--radius);font-size:13px;font-family:var(--sans)" maxlength="30">
+          <button type="button" onclick="saveInlineTag()" style="padding:5px 12px;background:var(--ink);color:var(--white);border:none;border-radius:var(--radius);cursor:pointer;font-size:12px;font-weight:700;font-family:var(--sans)">Thêm</button>
+          <button type="button" onclick="hideItc()" style="padding:5px 8px;background:none;border:1px solid var(--border2);border-radius:var(--radius);cursor:pointer;font-size:12px;font-family:var(--sans)">Huỷ</button>
+        </div>
+        <div class="itc-colors" id="itc-colors"></div>
+      </div>
     </div>
     <div class="frow">
       <label>Mô tả <span style="font-weight:400;color:var(--ink3)">(tuỳ chọn — ghi chú, link tài liệu...)</span></label>
@@ -521,7 +536,7 @@ let TAGS=[
 ];
 
 let tasks=[],view='all',activeDay=TODAY,filterTag=null,editId=null,blockId=null,blockDay=null,blockWk=null,selTag=null,weekOffset=0;
-let selectMode=false,selected=new Set();
+let selectMode=false,selected=new Set(),collapsedDays=new Set();
 
 function getWeekStart(off){const n=new Date(),jd=n.getDay(),m=new Date(n);m.setDate(n.getDate()+(jd===0?-6:1-jd)+off*7);m.setHours(0,0,0,0);return m;}
 function wkKey(off){return getWeekStart(off).toISOString().slice(0,10);}
@@ -736,10 +751,13 @@ function renderSidebar(){
   const nav=document.getElementById('day-nav');
   const isCurrentWeek=weekOffset===0;
   nav.innerHTML=DAYS.map(d=>{
-    const cnt=dts(d).length,dn=dd(d),isT=isCurrentWeek&&d===TODAY,isA=d===activeDay;
+    const cnt=dts(d).length,dn=dd(d),isT=isCurrentWeek&&d===TODAY,isA=d===activeDay,hrs=dh(d);
     return`<button class="day-btn${isA?' active':''}${isT?' today':''}" onclick="selDay('${d}')">
       <span>${DFULL[d]}${isT?'<span class="today-mark"></span>':''} <span style="font-size:10px;font-weight:400;opacity:0.55">${dayLabel(d,weekOffset)}</span></span>
-      ${cnt?`<span class="pill">${dn}/${cnt}</span>`:''}
+      <span style="display:flex;align-items:center;gap:4px">
+        ${hrs?`<span style="font-size:10px;font-weight:700;background:var(--purple-light);color:var(--purple);padding:1px 6px;border-radius:99px">${hrs}h</span>`:''}
+        ${cnt?`<span class="pill">${dn}/${cnt}</span>`:''}
+      </span>
     </button>`;
   }).join('');
   const wt=wtasks(),tot=wt.length,dn=wt.filter(t=>t.done).length,hrs=Math.round(wt.reduce((a,t)=>a+th(t),0)*10)/10;
@@ -878,32 +896,44 @@ function renderAllTasks(){
     for(const d of DAYS){
       const dt=fil.filter(t=>t.day===d);if(!dt.length)continue;
       const dn2=dt.filter(t=>t.done).length;
-      body+=`<div class="group-sec"><div class="group-lbl" style="font-size:11px;color:var(--ink2);font-weight:600;letter-spacing:0.04em">${DFULL[d]}${d===TODAY?' — hôm nay':''} <span style="font-weight:400;color:var(--ink3)">${dn2}/${dt.length} xong</span></div><div class="task-stack">`;
-      const wk=wkKey(weekOffset);
-      for(const t of dt){const tg=getTag(t.tag);const h=th(t);const isSel=selectMode&&selected.has(t.id);const rl=recurLabel(t);
-        body+=`<div class="task-row${t.done?' done':''}${isSel?' selected':''}" data-tid="${t.id}"
-          ${selectMode?`onclick="toggleSelect(${t.id},event)" style="cursor:pointer"`:
-            `ondblclick="openTaskModal(${t.id})"`}>
-          ${selectMode?`<div class="sel-chk${isSel?' on':''}">${isSel?'✓':''}</div>`:''}
-          <div class="chk${t.done?' on':''}" ${selectMode?'':'onclick="toggle('+t.id+',\''+d+'\',\''+wk+'\')" ondblclick="event.stopPropagation()"'} role="checkbox" aria-checked="${t.done}" tabindex="0">${t.done?IC.chk:''}</div>
-          <div class="task-body">
-            <div class="task-top">
-              <span class="task-name">${t.name}${t.qty>1?` ×${t.qty}`:''}</span>
-              <span class="tag" style="background:${tg.bg};color:${tg.color}">${tg.label}</span>
+      const hrs2=Math.round(dt.reduce((a,t)=>a+th(t),0)*10)/10;
+      const collapsed=collapsedDays.has(d);
+      body+=`<div class="group-sec">
+        <button onclick="toggleDayCollapse('${d}')" style="display:flex;align-items:center;gap:8px;margin-bottom:${collapsed?2:10}px;background:none;border:none;cursor:pointer;width:100%;text-align:left;padding:6px 2px;font-family:var(--sans)">
+          <span style="font-size:16px;color:var(--ink2);display:inline-block;transform:rotate(${collapsed?'-90':'0'}deg);transition:transform 0.15s;line-height:1">▾</span>
+          <span style="font-size:16px;color:var(--ink);font-weight:700">${DFULL[d]}${d===TODAY?' <span style="font-size:12px;font-weight:500;color:var(--purple)">— hôm nay</span>':''}</span>
+          <span style="font-size:11px;font-weight:600;color:var(--ink3)">${dn2}/${dt.length} xong</span>
+          <span style="font-size:11px;font-weight:700;background:var(--purple-light);color:var(--purple);border-radius:99px;padding:1px 8px">${hrs2}h</span>
+        </button>`;
+      if(!collapsed){
+        body+=`<div class="task-stack">`;
+        const wk=wkKey(weekOffset);
+        for(const t of dt){const tg=getTag(t.tag);const h=th(t);const isSel=selectMode&&selected.has(t.id);const rl=recurLabel(t);
+          body+=`<div class="task-row${t.done?' done':''}${isSel?' selected':''}" data-tid="${t.id}"
+            ${selectMode?`onclick="toggleSelect(${t.id},event)" style="cursor:pointer"`:
+              `ondblclick="openTaskModal(${t.id})"`}>
+            ${selectMode?`<div class="sel-chk${isSel?' on':''}">${isSel?'✓':''}</div>`:''}
+            <div class="chk${t.done?' on':''}" ${selectMode?'':'onclick="toggle('+t.id+',\''+d+'\',\''+wk+'\')" ondblclick="event.stopPropagation()"'} role="checkbox" aria-checked="${t.done}" tabindex="0">${t.done?IC.chk:''}</div>
+            <div class="task-body">
+              <div class="task-top">
+                <span class="task-name">${t.name}${t.qty>1?` ×${t.qty}`:''}</span>
+                <span class="tag" style="background:${tg.bg};color:${tg.color}">${tg.label}</span>
+              </div>
+              <div class="task-meta">
+                <span>${IC.clk} ${h}h</span>
+                ${t.start?`<span>${t.start}</span>`:''}
+                ${t.deadline?`<span>${IC.flg} ${DFULL[t.deadline]}</span>`:''}
+                ${rl?`<span class="recur-tag">${rl}</span>`:''}
+              </div>
+              ${t.desc?`<div class="task-output" style="color:var(--purple);font-style:normal">📎 ${t.desc}</div>`:''}
+              ${t.output?`<div class="task-output">↳ ${t.output}</div>`:''}
             </div>
-            <div class="task-meta">
-              <span>${IC.clk} ${h}h</span>
-              ${t.start?`<span>${t.start}</span>`:''}
-              ${t.deadline?`<span>${IC.flg} ${DFULL[t.deadline]}</span>`:''}
-              ${rl?`<span class="recur-tag">${rl}</span>`:''}
-            </div>
-            ${t.desc?`<div class="task-output" style="color:var(--purple);font-style:normal">📎 ${t.desc}</div>`:''}
-            ${t.output?`<div class="task-output">↳ ${t.output}</div>`:''}
-          </div>
-          ${selectMode?'':`<button class="del" onclick="delTask(${t.id})" ondblclick="event.stopPropagation()" aria-label="Xoá">${IC.del}</button>`}
-        </div>`;
+            ${selectMode?'':`<button class="del" onclick="delTask(${t.id})" ondblclick="event.stopPropagation()" aria-label="Xoá">${IC.del}</button>`}
+          </div>`;
+        }
+        body+=`</div>`;
       }
-      body+='</div></div>';
+      body+=`</div>`;
     }
   }
   const tot=fil.length,dn=fil.filter(t=>t.done).length,hrs=Math.round(fil.reduce((a,t)=>a+th(t),0)*10)/10;
@@ -997,6 +1027,7 @@ function selDay(d){activeDay=d;view='day';render()}
 function navWeek(dir){weekOffset+=dir;if(weekOffset===0)activeDay=TODAY;render();}
 function goToday(){weekOffset=0;activeDay=TODAY;view='day';render();}
 function setFilter(t){filterTag=t;renderMain()}
+function toggleDayCollapse(d){if(collapsedDays.has(d))collapsedDays.delete(d);else collapsedDays.add(d);renderMain();}
 function toggle(id,d,wk){
   const t=tasks.find(x=>x.id===id);if(!t)return;
   if(t.recur&&t.recur!=='none'){
@@ -1067,8 +1098,32 @@ function addFromCol(d,e){
   document.getElementById('f-start').value=`${String(hr).padStart(2,'0')}:${String(mn).padStart(2,'0')}`;
 }
 function closeTaskModal(){document.getElementById('task-modal').classList.remove('open');editId=null;selTag=null}
-function renderTP(){document.getElementById('tag-picker').innerHTML=TAGS.map(t=>`<span class="tpchip${selTag===t.id?' sel':''}" style="background:${t.bg};color:${t.color}" onclick="selTagFn('${t.id}')">${t.label}</span>`).join('')}
+let itcColor=0;
+function renderTP(){
+  document.getElementById('tag-picker').innerHTML=
+    TAGS.map(t=>`<span class="tpchip${selTag===t.id?' sel':''}" style="background:${t.bg};color:${t.color}" onclick="selTagFn('${t.id}')">${t.label}</span>`).join('')+
+    `<button type="button" class="tpchip-add" onclick="showItc()">+ Tạo nhóm</button>`;
+}
 function selTagFn(id){selTag=id;renderTP()}
+function showItc(){
+  itcColor=TAGS.length%COLOR_PRESETS.length;
+  document.getElementById('itc-panel').style.display='flex';
+  document.getElementById('itc-colors').innerHTML=COLOR_PRESETS.map((c,i)=>`<div class="itc-swatch${i===itcColor?' sel':''}" style="background:${c.bar}" onclick="itcSelColor(${i})"></div>`).join('');
+  setTimeout(()=>document.getElementById('itc-name').focus(),50);
+}
+function hideItc(){document.getElementById('itc-panel').style.display='none';document.getElementById('itc-name').value='';}
+function itcSelColor(i){
+  itcColor=i;
+  document.querySelectorAll('.itc-swatch').forEach((el,j)=>el.classList.toggle('sel',j===i));
+}
+function saveInlineTag(){
+  const name=document.getElementById('itc-name').value.trim();
+  if(!name)return;
+  const c=COLOR_PRESETS[itcColor];
+  const id='tag_'+Date.now();
+  TAGS.push({id,label:name,...c});
+  saveTagLabels();selTag=id;hideItc();renderTP();
+}
 function saveTask(){
   const name=document.getElementById('f-name').value.trim();
   if(!name){alert('Vui lòng nhập tên task');return}
